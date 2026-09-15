@@ -13,5 +13,6 @@ public class Campaign
     public ICollection<Location> Locations { get; set; } = new List<Location>();
     public ICollection<RuleCategory> RuleCategory { get; set; } = new List<RuleCategory>();
     public ICollection<Counter> Counters { get; set; } = new List<Counter>();
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
