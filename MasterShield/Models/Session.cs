@@ -12,3 +12,5 @@ public class Session
 
     public Campaign Campaign { get; set; } = null!;
     public ICollection<Encounter> Encounters { get; set; } = new List<Encounter>();
+    public ICollection<Note> Notes { get; set; } = new List<Note>();
+}
