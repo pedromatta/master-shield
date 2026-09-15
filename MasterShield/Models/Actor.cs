@@ -14,4 +14,5 @@ public class Actor
     public Campaign Campaign { get; set; } = null!;
     public ICollection<Resource> Resources { get; set; } = new List<Resources>();
     public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
