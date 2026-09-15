@@ -9,4 +9,6 @@ public class Rule
 
     public RuleCategory Category { get; set; } = null!;
     public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
+
+    public Dictionary<string, object> SystemData { get; set; } = new();
 }

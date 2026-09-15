@@ -10,4 +10,6 @@ public class Resource
     public string ColorHwx { get; set; } = "#000000";
 
     public Actor Actor { get; set; } = null!;
+
+    public Dictionary<string, object> SystemData { get; set; } = new();
 }

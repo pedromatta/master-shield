@@ -13,20 +13,32 @@ public class MasterShieldContext : DbContext
     public required DbSet<Counter> Counters { get; set; }
     public required DbSet<Encounter> Encounters { get; set; }
     public required DbSet<EncounterParticipant> EncounterParticipants { get; set; }
+    public required DbSet<GameSystem> GameSystems { get; set; }
     public required DbSet<Location> Locations { get; set; }
     public required DbSet<Note> Notes { get; set; }
     public required DbSet<Resource> Resources { get; set; }
     public required DbSet<Rule> Rules { get; set; }
     public required DbSet<RuleCategory> RuleCategories { get; set; }
     public required DbSet<Session> Sessions { get; set; }
+    public required DbSet<SystemBlueprint> SystemBlueprints { get; set; }
     public required DbSet<Tag> Tags { get; set; }
     public required DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Actor>()
-            .OwnsOne(a => a.SystemData, builder => {
-                builder.ToJson();
-            });
+            .OwnsOne(a => a.SystemData, builder => { builder.ToJson(); });
+
+        modelBuilder.Entity<Campaign>()
+            .OwnsOne(c => c.SystemData, builder => { builder.ToJson(); });
+
+        modelBuilder.Entity<Resource>()
+            .OwnsOne(r => r.SystemData, builder => { builder.ToJson(); });
+
+        modelBuilder.Entity<Rule>()
+            .OwnsOne(r => r.SystemData, builder => { builder.ToJson(); });
+
+        modelBuilder.Entity<SystemBlueprint>()
+            .OwnsOne(sb => sb.DefaultPayload, builder => { builder.ToJson(); });
     }
 }

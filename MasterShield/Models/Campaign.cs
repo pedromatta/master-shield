@@ -5,7 +5,10 @@ public class Campaign
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string System { get; set; } = "Outro";
+
+    public Guid? GameSystemId { get; set; }
+    public GameSystem? GameSystem { get; set; }
+    public Dictionary<string, object> SystemData { get; set; } = new();
 
     public User User { get; set; } = null!;
 
