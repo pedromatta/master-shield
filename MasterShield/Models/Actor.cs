@@ -12,7 +12,7 @@ public class Actor
     public Dictionary<string, object> SystemData { get; set; } = new();
 
     public Campaign Campaign { get; set; } = null!;
-    public ICollection<Resource> Resources { get; set; } = new List<Resources>();
+    public ICollection<Resource> Resources { get; set; } = new List<Resource>();
     public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
