@@ -1,0 +1,7 @@
+@if (family() === 'ra') {
+  <i [class]="raClass()" [attr.aria-hidden]="label() ? null : 'true'" [attr.aria-label]="label()"></i>
+} @else {
+  <ng-container
+    *ngComponentOutlet="lucideComponent(); inputs: lucideInputs()"
+  />
+}
