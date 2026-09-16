@@ -1,0 +1,307 @@
+<section class="mt-3 rounded border border-slate-800 bg-slate-950/40 p-2">
+  <header class="mb-2 flex flex-wrap items-center gap-1.5">
+    <h3 class="mr-auto text-xs font-semibold text-slate-200">System content</h3>
+
+    <label class="cursor-pointer rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
+      Import list
+      <input
+        type="file"
+        accept="application/json,.json"
+        class="sr-only"
+        (change)="importList($event)"
+      />
+    </label>
+    <button
+      type="button"
+      class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      (click)="exportList()"
+    >
+      Export list
+    </button>
+    <button
+      type="button"
+      class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+      [disabled]="busy()"
+      (click)="startCreate()"
+    >
+      + New
+    </button>
+  </header>
+
+  @if (error()) {
+    <p class="mb-2 rounded border border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+      {{ error() }}
+    </p>
+  }
+  @if (status()) {
+    <p class="mb-2 rounded border border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[11px] text-emerald-300" role="status">
+      {{ status() }}
+    </p>
+  }
+
+  <!-- Kind tabs (hidden when the hosting window drives the kind) -->
+  @if (showKindTabs()) {
+    <nav class="mb-2 flex flex-wrap gap-1" aria-label="Entity kinds">
+      @for (kind of kinds; track kind) {
+        <button
+          type="button"
+          class="rounded px-2 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [class]="
+            editedKind() === kind
+              ? 'bg-slate-800 font-medium text-sky-300'
+              : 'text-slate-400 hover:bg-slate-900'
+          "
+          [attr.aria-current]="editedKind() === kind ? 'true' : null"
+          (click)="activeKind.set(kind)"
+        >
+          {{ kind }}s
+          <span class="text-[9px] text-slate-500">{{ countFor(kind) }}</span>
+        </button>
+      }
+    </nav>
+  }
+
+  @if (showCreate()) {
+    <div class="mb-2 space-y-1.5 rounded border border-slate-800 bg-slate-900/60 p-2">
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="min-w-0 flex-1">
+          <label for="tpl-name" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">Name</label>
+          <input
+            id="tpl-name"
+            type="text"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="draftName()"
+            (input)="draftName.set($any($event.target).value)"
+            (keydown.enter)="create()"
+          />
+        </div>
+        <div class="w-40">
+          <label for="tpl-category" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+            {{ categoryLabel(editedKind()) }}
+          </label>
+          @if (categoryOptions(editedKind()).length > 0) {
+            <select
+              id="tpl-category"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+              [value]="draftCategory()"
+              (change)="draftCategory.set($any($event.target).value)"
+            >
+              @for (option of categoryOptions(editedKind()); track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          } @else {
+            <input
+              id="tpl-category"
+              type="text"
+              [placeholder]="categoryPlaceholder(editedKind())"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              [value]="draftCategory()"
+              (input)="draftCategory.set($any($event.target).value)"
+            />
+          }
+        </div>
+        <button
+          type="button"
+          class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="busy() || !draftName().trim()"
+          (click)="create()"
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          (click)="cancelCreate()"
+        >
+          Cancel
+        </button>
+      </div>
+      <label for="tpl-desc" class="sr-only">Description</label>
+      <textarea
+        id="tpl-desc"
+        rows="2"
+        placeholder="Description / content"
+        class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+        [value]="draftDescription()"
+        (input)="draftDescription.set($any($event.target).value)"
+      ></textarea>
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="py-3 text-center text-[11px] italic text-slate-500">Loading…</p>
+  } @else if (visible().length === 0) {
+    <p class="py-3 text-center text-[11px] italic text-slate-500">
+      No {{ editedKind().toLowerCase() }} entities yet.
+    </p>
+  } @else {
+    <ul class="space-y-1">
+      @for (entry of visible(); track entry.id) {
+        <li class="rounded border border-slate-800 bg-slate-900/50">
+          <div class="flex items-center gap-2 p-1.5">
+            <button
+              type="button"
+              class="min-w-0 flex-1 truncate text-left text-[11px] text-slate-200 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              [attr.aria-expanded]="isExpanded(entry)"
+              (click)="toggle(entry)"
+            >
+              {{ entry.name }}
+              @if (entry.category) {
+                <span class="text-[9px] text-slate-500">· {{ entry.category }}</span>
+              }
+              @if (entry.kind === 'Actor' && entry.resources.length > 0) {
+                <span class="text-[9px] text-slate-500">· {{ entry.resources.length }} resource(s)</span>
+              }
+            </button>
+            <button
+              type="button"
+              class="shrink-0 rounded px-1 text-[10px] text-rose-400 transition hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+              [attr.aria-label]="'Delete ' + entry.name"
+              (click)="remove(entry)"
+            >
+              <app-icon name="lu:x" [size]="11" />
+            </button>
+          </div>
+
+          @if (isExpanded(entry)) {
+            <div class="space-y-2 border-t border-slate-800 p-2">
+              <div class="flex flex-wrap items-start gap-2">
+                <app-image-upload
+                  label="Image"
+                  placeholder="Upload"
+                  [imageUri]="entry.imageUri"
+                  [alt]="entry.name"
+                  (fileChosen)="onImageChosen(entry, $event)"
+                />
+                <div class="min-w-0 flex-1 space-y-1">
+                  <label class="sr-only" [attr.for]="'tpl-name-' + entry.id">Name</label>
+                  <input
+                    [id]="'tpl-name-' + entry.id"
+                    type="text"
+                    class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+                    [value]="entry.name"
+                    (input)="patch(entry, { name: $any($event.target).value })"
+                  />
+                  <div class="flex items-center gap-2">
+                    <label class="text-[10px] uppercase tracking-wider text-slate-500" [attr.for]="'tpl-cat-' + entry.id">
+                      {{ categoryLabel(entry.kind) }}
+                    </label>
+                    @if (categoryOptions(entry.kind).length > 0) {
+                      <select
+                        [id]="'tpl-cat-' + entry.id"
+                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                        [value]="entry.category"
+                        (change)="patch(entry, { category: $any($event.target).value })"
+                      >
+                        @for (option of categoryOptions(entry.kind); track option) {
+                          <option [value]="option">{{ option }}</option>
+                        }
+                      </select>
+                    } @else {
+                      <input
+                        [id]="'tpl-cat-' + entry.id"
+                        type="text"
+                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                        [value]="entry.category"
+                        (input)="patch(entry, { category: $any($event.target).value })"
+                      />
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <label class="sr-only" [attr.for]="'tpl-desc-' + entry.id">Description</label>
+              <textarea
+                [id]="'tpl-desc-' + entry.id"
+                rows="3"
+                placeholder="Description / content"
+                class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                [value]="entry.description"
+                (input)="patch(entry, { description: $any($event.target).value })"
+              ></textarea>
+
+              @if (entry.kind === 'Actor') {
+                <div class="rounded border border-slate-800 bg-slate-950/60 p-1.5">
+                  <div class="mb-1 flex items-center justify-between">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-500">Default resources</span>
+                    <button
+                      type="button"
+                      class="text-[10px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      (click)="addResource(entry)"
+                    >
+                      + Resource
+                    </button>
+                  </div>
+                  @if (entry.resources.length === 0) {
+                    <p class="text-[10px] italic text-slate-600">No resources.</p>
+                  } @else {
+                    <ul class="space-y-1">
+                      @for (resource of entry.resources; track $index) {
+                        <li class="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            [value]="resource.nome"
+                            (input)="updateResource(entry, $index, { nome: $any($event.target).value })"
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            [value]="resource.currentValue"
+                            (input)="updateResource(entry, $index, { currentValue: +$any($event.target).value })"
+                          />
+                          <span class="text-[10px] text-slate-600">/</span>
+                          <input
+                            type="number"
+                            min="0"
+                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            [value]="resource.maxValue"
+                            (input)="updateResource(entry, $index, { maxValue: +$any($event.target).value })"
+                          />
+                          <input
+                            type="color"
+                            class="h-6 w-7 cursor-pointer rounded border border-slate-700 bg-slate-950"
+                            [value]="resource.colorHwx"
+                            (input)="updateResource(entry, $index, { colorHwx: $any($event.target).value })"
+                          />
+                          <button
+                            type="button"
+                            class="rounded px-1 text-[10px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                            aria-label="Remove resource"
+                            (click)="removeResource(entry, $index)"
+                          >
+                            <app-icon name="lu:x" [size]="11" />
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
+
+              <div class="flex justify-end gap-1.5">
+                <button
+                  type="button"
+                  class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  (click)="toggle(entry)"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+                  [disabled]="busy()"
+                  (click)="save(entry)"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

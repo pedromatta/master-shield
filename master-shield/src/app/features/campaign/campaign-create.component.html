@@ -1,0 +1,223 @@
+<section
+  class="mx-auto w-full max-w-lg rounded-lg border border-slate-800 bg-slate-900/70 p-4"
+  [class.shadow-2xl]="asDialog()"
+>
+  <header class="mb-3">
+    <h2 class="text-base font-semibold text-slate-100">
+      {{ needsAccount() ? 'Set up Master Shield' : 'New campaign' }}
+    </h2>
+    <p class="mt-0.5 text-xs text-slate-400">
+      @if (needsAccount()) {
+        No accounts exist yet. Create one owner account along with your first campaign.
+      } @else {
+        Creating as
+        <span class="font-medium text-sky-400">{{ gameState.activeUser()?.username }}</span
+        >.
+      }
+    </p>
+  </header>
+
+  @if (error()) {
+    <p
+      class="mb-3 rounded border border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-300"
+      role="alert"
+    >
+      {{ error() }}
+    </p>
+  }
+
+  @if (needsAccount()) {
+    <fieldset class="mb-4 rounded border border-slate-800 p-3">
+      <legend class="px-1 text-[10px] uppercase tracking-wider text-slate-500">
+        Owner account
+      </legend>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div class="col-span-1">
+          <label
+            for="owner-username"
+            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+          >
+            Username <span aria-hidden="true" class="text-rose-400">*</span>
+          </label>
+          <input
+            id="owner-username"
+            type="text"
+            required
+            autocomplete="username"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="ownerUsername()"
+            (input)="ownerUsername.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="col-span-1">
+          <label
+            for="owner-email"
+            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+          >
+            Email
+          </label>
+          <input
+            id="owner-email"
+            type="email"
+            autocomplete="email"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="ownerEmail()"
+            (input)="ownerEmail.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="col-span-2">
+          <label
+            for="owner-password"
+            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+          >
+            Password <span aria-hidden="true" class="text-rose-400">*</span>
+          </label>
+          <input
+            id="owner-password"
+            type="password"
+            required
+            autocomplete="new-password"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="ownerPassword()"
+            (input)="ownerPassword.set($any($event.target).value)"
+          />
+          <p class="mt-1 text-[10px] text-slate-500">
+            Stored hashed. There is no sign-in yet — this only identifies the campaign owner.
+          </p>
+        </div>
+      </div>
+    </fieldset>
+  }
+
+  <div class="space-y-2">
+    <div>
+      <label
+        for="campaign-name"
+        class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+      >
+        Campaign name <span aria-hidden="true" class="text-rose-400">*</span>
+      </label>
+      <input
+        id="campaign-name"
+        type="text"
+        required
+        placeholder="Masks of Nyarlathotep"
+        class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+        [value]="name()"
+        (input)="onName($any($event.target).value)"
+        (keydown.enter)="submit()"
+      />
+    </div>
+
+    <div>
+      <label
+        for="campaign-system"
+        class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+      >
+        Game system
+      </label>
+      <div class="flex items-center gap-2">
+        <select
+          id="campaign-system"
+          class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+          [value]="gameSystemId()"
+          (change)="gameSystemId.set($any($event.target).value)"
+        >
+          <option value="">— none —</option>
+          @for (system of gameState.gameSystems(); track system.id) {
+            <option [value]="system.id">{{ system.name }} {{ system.version }}</option>
+          }
+        </select>
+        <button
+          type="button"
+          class="shrink-0 rounded border border-slate-700 px-2 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [attr.aria-expanded]="showNewSystem()"
+          (click)="showNewSystem.set(!showNewSystem())"
+        >
+          + System
+        </button>
+      </div>
+
+      @if (gameSystemId()) {
+        <label class="mt-1.5 flex cursor-pointer items-center gap-1.5 text-[11px] text-slate-400">
+          <input
+            type="checkbox"
+            class="size-3 accent-sky-500"
+            [checked]="seedSystemContent()"
+            (change)="seedSystemContent.set($any($event.target).checked)"
+          />
+          Import the system's actors, locations, rules and notes into this campaign
+        </label>
+      }
+
+      @if (showNewSystem()) {
+        <div class="mt-2 flex items-end gap-2 rounded border border-slate-800 bg-slate-950/60 p-2">
+          <div class="min-w-0 flex-1">
+            <label
+              for="new-system-name"
+              class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+            >
+              System name
+            </label>
+            <input
+              id="new-system-name"
+              type="text"
+              placeholder="Call of Cthulhu"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              [value]="newSystemName()"
+              (input)="newSystemName.set($any($event.target).value)"
+            />
+          </div>
+          <div class="w-20">
+            <label
+              for="new-system-version"
+              class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+            >
+              Version
+            </label>
+            <input
+              id="new-system-version"
+              type="text"
+              placeholder="7e"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              [value]="newSystemVersion()"
+              (input)="newSystemVersion.set($any($event.target).value)"
+            />
+          </div>
+          <button
+            type="button"
+            class="rounded bg-slate-700 px-2 py-1 text-xs font-medium text-white transition hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+            [disabled]="!newSystemName().trim()"
+            (click)="createGameSystem()"
+          >
+            Add
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <footer class="mt-4 flex items-center gap-2">
+    <button
+      type="button"
+      class="rounded bg-sky-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-40"
+      [disabled]="!canSubmit()"
+      (click)="submit()"
+    >
+      {{ saving() ? 'Creating…' : 'Create campaign' }}
+    </button>
+
+    @if (asDialog()) {
+      <button
+        type="button"
+        class="rounded border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        (click)="cancelled.emit()"
+      >
+        Cancel
+      </button>
+    }
+  </footer>
+</section>

@@ -1,0 +1,332 @@
+<section class="space-y-3" aria-label="Blueprints">
+  <!-- Kind tabs -->
+  <div class="flex flex-wrap gap-0.5 border-b border-slate-800">
+    @for (kind of kinds; track kind) {
+      <button
+        type="button"
+        class="-mb-px rounded-t border-b-2 px-2.5 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        [class]="
+          activeKind() === kind
+            ? 'border-sky-500 text-sky-300'
+            : 'border-transparent text-slate-400 hover:text-slate-200'
+        "
+        [attr.aria-selected]="activeKind() === kind"
+        (click)="activeKind.set(kind)"
+      >
+        {{ kind }}
+      </button>
+    }
+  </div>
+
+  @if (activeKind() === 'Actor') {
+    <div class="flex flex-wrap gap-1">
+      @for (type of actorTypes; track type) {
+        <button
+          type="button"
+          class="rounded border px-2 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [class]="
+            activeActorType() === type
+              ? 'border-sky-600 bg-slate-800 text-sky-300'
+              : 'border-slate-700 text-slate-400 hover:text-slate-200'
+          "
+          [attr.aria-pressed]="activeActorType() === type"
+          (click)="activeActorType.set(type)"
+        >
+          {{ type === 'PlayerCharacter' ? 'Player characters' : 'NPCs' }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (error()) {
+    <p class="rounded border border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">{{ error() }}</p>
+  }
+  @if (status()) {
+    <p class="rounded border border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[11px] text-emerald-300" role="status">{{ status() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="py-3 text-center text-[11px] italic text-slate-500">Loading…</p>
+  } @else if (current(); as blueprint) {
+    <div class="space-y-3">
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="min-w-0 flex-1">
+          <label class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500" [attr.for]="'bp-name'">
+            Blueprint name
+          </label>
+          <input
+            id="bp-name"
+            type="text"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="blueprint.name"
+            (input)="patch({ name: $any($event.target).value })"
+          />
+        </div>
+        <button
+          type="button"
+          class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="busy()"
+          (click)="save()"
+        >
+          Save blueprint
+        </button>
+        <button
+          type="button"
+          class="rounded border border-slate-700 px-2 py-1 text-[11px] text-rose-400 transition hover:border-rose-600 hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 disabled:opacity-40"
+          [disabled]="busy()"
+          (click)="remove()"
+        >
+          Delete
+        </button>
+      </div>
+
+      @if (blueprint.kind === 'Actor') {
+        <!-- Default resources -->
+        <div class="rounded border border-slate-800 bg-slate-950/50 p-2">
+          <div class="mb-1.5 flex items-center justify-between">
+            <h4 class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              Default resources
+            </h4>
+            <button
+              type="button"
+              class="text-[10px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              (click)="addResource()"
+            >
+              + Resource
+            </button>
+          </div>
+          <p class="mb-1.5 text-[10px] text-slate-500">
+            Every new actor gets these resource bars. “Overview” controls whether the resource
+            shows on the character card and encounter row.
+          </p>
+          @if (blueprint.resources.length === 0) {
+            <p class="text-[10px] italic text-slate-600">No default resources.</p>
+          } @else {
+            <ul class="space-y-1">
+              @for (resource of blueprint.resources; track $index) {
+                <li class="flex flex-wrap items-center gap-1.5">
+                  <input
+                    type="text"
+                    class="min-w-[6rem] flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                    [value]="resource.nome"
+                    (input)="updateResource($index, { nome: $any($event.target).value })"
+                  />
+                  <input
+                    type="number"
+                    class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                    [value]="resource.currentValue"
+                    (input)="updateResource($index, { currentValue: +$any($event.target).value })"
+                  />
+                  <span class="text-[10px] text-slate-600">/</span>
+                  <input
+                    type="number"
+                    class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                    [value]="resource.maxValue"
+                    (input)="updateResource($index, { maxValue: +$any($event.target).value })"
+                  />
+                  <input
+                    type="color"
+                    class="h-6 w-7 cursor-pointer rounded border border-slate-700 bg-slate-950"
+                    [value]="resource.colorHwx"
+                    (input)="updateResource($index, { colorHwx: $any($event.target).value })"
+                  />
+                  <label class="flex items-center gap-1 text-[10px] text-slate-400">
+                    <input
+                      type="checkbox"
+                      class="size-3 accent-sky-500"
+                      [checked]="resource.showInOverview"
+                      (change)="updateResource($index, { showInOverview: $any($event.target).checked })"
+                    />
+                    Overview
+                  </label>
+                  <button
+                    type="button"
+                    class="rounded px-1 text-[10px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    aria-label="Remove resource"
+                    (click)="removeResource($index)"
+                  >
+                    <app-icon name="lu:x" [size]="11" />
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <!-- System attributes -->
+      <div class="rounded border border-slate-800 bg-slate-950/50 p-2">
+        <div class="mb-1.5 flex items-center justify-between">
+          <h4 class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            {{ blueprint.kind === 'Actor' ? 'Actor attributes' : blueprint.kind + ' attributes' }}
+          </h4>
+          <button
+            type="button"
+            class="text-[10px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            (click)="addAttribute()"
+          >
+            + Attribute
+          </button>
+        </div>
+        <p class="mb-1.5 text-[10px] text-slate-500">
+          Game-specific fields every new {{ blueprint.kind.toLowerCase() }} starts with — for
+          example AC in DnD or damage thresholds in Daggerheart. “Overview” pins the field to
+          the actor card.
+        </p>
+        @if (blueprint.attributes.length === 0) {
+          <p class="text-[10px] italic text-slate-600">No attributes defined.</p>
+        } @else {
+          <ul class="space-y-1">
+            @for (attribute of blueprint.attributes; track $index) {
+              <li class="flex flex-wrap items-center gap-1.5">
+                <input
+                  type="text"
+                  class="min-w-[6rem] flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                  [value]="attribute.key"
+                  (input)="updateAttribute($index, { key: $any($event.target).value })"
+                />
+                <select
+                  class="rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                  [value]="attribute.type"
+                  (change)="updateAttribute($index, { type: $any($event.target).value })"
+                >
+                  <option value="text">Text</option>
+                  <option value="number">Number</option>
+                  <option value="boolean">Boolean</option>
+                </select>
+                @if (attribute.type === 'boolean') {
+                  <select
+                    class="rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                    [value]="attribute.defaultValue"
+                    (change)="updateAttribute($index, { defaultValue: $any($event.target).value })"
+                  >
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                  </select>
+                } @else {
+                  <input
+                    [type]="attribute.type === 'number' ? 'number' : 'text'"
+                    placeholder="default"
+                    class="w-20 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                    [value]="attribute.defaultValue"
+                    (input)="updateAttribute($index, { defaultValue: $any($event.target).value })"
+                  />
+                }
+                <label class="flex items-center gap-1 text-[10px] text-slate-400">
+                  <input
+                    type="checkbox"
+                    class="size-3 accent-sky-500"
+                    [checked]="attribute.showInOverview"
+                    (change)="updateAttribute($index, { showInOverview: $any($event.target).checked })"
+                  />
+                  Overview
+                </label>
+                <button
+                  type="button"
+                  class="rounded px-1 text-[10px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  aria-label="Remove attribute"
+                  (click)="removeAttribute($index)"
+                >
+                  <app-icon name="lu:x" [size]="11" />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Default categories -->
+      <div class="grid gap-2 sm:grid-cols-2">
+        <div class="rounded border border-slate-800 bg-slate-950/50 p-2">
+          <h4 class="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            Default rule categories
+          </h4>
+          <p class="mb-1.5 text-[10px] text-slate-500">
+            Created for campaigns that adopt this system — DnD: Classes, Races; Daggerheart:
+            Domains, Communities.
+          </p>
+          <ul class="mb-1.5 flex flex-wrap gap-1">
+            @for (category of blueprint.ruleCategories; track $index) {
+              <li class="inline-flex items-center gap-1 rounded-full border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300">
+                {{ category }}
+                <button
+                  type="button"
+                  class="text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  [attr.aria-label]="'Remove ' + category"
+                  (click)="removeCategory('ruleCategories', $index)"
+                >
+                  <app-icon name="lu:x" [size]="11" />
+                </button>
+              </li>
+            } @empty {
+              <li class="text-[10px] italic text-slate-600">None yet.</li>
+            }
+          </ul>
+          <label class="sr-only" for="bp-rule-cat">Add rule category</label>
+          <input
+            id="bp-rule-cat"
+            type="text"
+            placeholder="Add category and press Enter"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+            #ruleCat
+            (keydown.enter)="addCategory('ruleCategories', ruleCat.value); ruleCat.value = ''"
+          />
+        </div>
+
+        <div class="rounded border border-slate-800 bg-slate-950/50 p-2">
+          <h4 class="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            Default note categories
+          </h4>
+          <p class="mb-1.5 text-[10px] text-slate-500">
+            Created for campaigns that adopt this system.
+          </p>
+          <ul class="mb-1.5 flex flex-wrap gap-1">
+            @for (category of blueprint.noteCategories; track $index) {
+              <li class="inline-flex items-center gap-1 rounded-full border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300">
+                {{ category }}
+                <button
+                  type="button"
+                  class="text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  [attr.aria-label]="'Remove ' + category"
+                  (click)="removeCategory('noteCategories', $index)"
+                >
+                  <app-icon name="lu:x" [size]="11" />
+                </button>
+              </li>
+            } @empty {
+              <li class="text-[10px] italic text-slate-600">None yet.</li>
+            }
+          </ul>
+          <label class="sr-only" for="bp-note-cat">Add note category</label>
+          <input
+            id="bp-note-cat"
+            type="text"
+            placeholder="Add category and press Enter"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+            #noteCat
+            (keydown.enter)="addCategory('noteCategories', noteCat.value); noteCat.value = ''"
+          />
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="rounded border border-dashed border-slate-800 p-4 text-center">
+      <app-icon name="lu:layers" [size]="22" />
+      <p class="mt-2 text-[11px] text-slate-400">
+        No {{ activeKind().toLowerCase() }} blueprint yet.
+      </p>
+      <p class="mt-0.5 text-[10px] text-slate-500">
+        A blueprint dictates the resources, attributes and categories every new
+        {{ activeKind().toLowerCase() }} starts with.
+      </p>
+      <button
+        type="button"
+        class="mt-2 rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+        [disabled]="busy()"
+        (click)="createBlueprint()"
+      >
+        Create {{ activeKind().toLowerCase() }} blueprint
+      </button>
+    </div>
+  }
+</section>
