@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MasterShield.Models;
 
 public class Campaign
@@ -10,6 +12,13 @@ public class Campaign
     public GameSystem? GameSystem { get; set; }
     public Dictionary<string, object> SystemData { get; set; } = new();
 
+    /// <summary>
+    /// The location whose image is currently projected as the battle map. The URL the
+    /// virtual tabletop points at never changes; swapping this value swaps the image.
+    /// </summary>
+    public Guid? CurrentMapLocationId { get; set; }
+
+    [JsonIgnore]
     public User User { get; set; } = null!;
 
     public ICollection<Actor> Actors { get; set; } = new List<Actor>();
