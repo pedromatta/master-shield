@@ -1,0 +1,38 @@
+<nav
+  class="flex shrink-0 items-center gap-1 overflow-x-auto border-t border-slate-800 bg-slate-900/90 justify-center px-2 py-1"
+  aria-label="Tools"
+>
+  @for (tool of tools; track trackTool($index, tool)) {
+    <button
+      type="button"
+      class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[9px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      [class]="isOpen(tool.kind) ? 'bg-slate-800 text-sky-300' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'"
+      [attr.aria-label]="'Open ' + tool.label"
+      [attr.aria-pressed]="isOpen(tool.kind)"
+      (click)="open(tool.kind)"
+    >
+      <app-icon [name]="tool.icon" [size]="18" />
+      <span>{{ tool.label }}</span>
+    </button>
+  }
+
+  @if (pinnedCategories().length > 0) {
+    <span class="mx-1 h-6 w-px shrink-0 bg-slate-800" aria-hidden="true"></span>
+
+    @for (category of pinnedCategories(); track trackCategory($index, category)) {
+      <button
+        type="button"
+        class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[9px] text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        [attr.aria-label]="'Open rules: ' + category.name"
+        (click)="openRuleCategory()"
+      >
+        @if (category.iconUri) {
+          <img [src]="resolveAsset(category.iconUri)" alt="" class="size-4 rounded-sm object-cover" loading="lazy" />
+        } @else {
+          <app-icon [name]="category.icon" [size]="18" />
+        }
+        <span class="max-w-[4rem] truncate">{{ category.name }}</span>
+      </button>
+    }
+  }
+</nav>

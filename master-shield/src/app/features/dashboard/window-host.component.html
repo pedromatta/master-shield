@@ -1,0 +1,76 @@
+<!-- Tiled windows -->
+@for (window of visible(); track trackWindow($index, window)) {
+  <app-window-frame [window]="window">
+    @switch (window.kind) {
+      @case ('actor-sheet') {
+        @if (window.contextId) {
+          <app-actor-sheet [actorId]="window.contextId" />
+        }
+      }
+      @case ('npc-grid') {
+        <app-npc-grid />
+      }
+      @case ('notes') {
+        <app-notes-panel />
+      }
+      @case ('encounter') {
+        <app-encounter-tracker [encounterId]="activeEncounterId()" />
+      }
+      @case ('counters') {
+        <app-counters-panel />
+      }
+      @case ('locations') {
+        <app-locations-panel />
+      }
+      @case ('rules') {
+        <app-rules-panel />
+      }
+      @case ('map') {
+        <app-map-panel />
+      }
+      @case ('sessions') {
+        <app-sessions-window />
+      }
+      @case ('campaigns') {
+        <app-campaigns-window />
+      }
+      @case ('systems') {
+        <app-game-system-manager [showClose]="false" />
+      }
+    }
+  </app-window-frame>
+}
+
+<!-- Minimized dock lives in the last row so it never overlaps the tiles -->
+@if (minimized().length > 0) {
+  <div
+    class="pointer-events-none col-span-full row-start-[8] flex items-end gap-1 self-end p-1"
+    role="toolbar"
+    aria-label="Minimized windows"
+  >
+    @for (window of minimized(); track trackWindow($index, window)) {
+      <button
+        type="button"
+        class="pointer-events-auto flex max-w-[10rem] items-center gap-1 rounded border border-slate-700 bg-slate-900/95 px-2 py-1 text-[10px] text-slate-300 shadow-lg transition hover:border-sky-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        [attr.aria-label]="'Restore ' + window.title"
+        (click)="restore(window.id)"
+      >
+        <app-icon [name]="window.icon" [size]="13" />
+        <span class="truncate">{{ window.title }}</span>
+      </button>
+    }
+  </div>
+}
+
+<!-- Empty state -->
+@if (!hasWindows()) {
+  <div class="col-span-full row-span-full grid place-items-center p-4">
+    <div class="max-w-md text-center">
+      <p class="text-sm text-slate-400">No windows open.</p>
+      <p class="mt-1 text-xs text-slate-600">
+        Use the tool bar below to open notes, NPCs, the encounter tracker, counters, maps or
+        rules. Windows tile into this area and can be minimized, maximized or closed.
+      </p>
+    </div>
+  </div>
+}

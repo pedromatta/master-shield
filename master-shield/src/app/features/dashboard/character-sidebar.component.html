@@ -1,0 +1,164 @@
+<aside
+  class="flex min-h-0 flex-col border-r border-slate-800 bg-slate-900/40 transition-[width] duration-150"
+  [class]="collapsed() ? 'w-10' : 'w-52'"
+  aria-label="Player characters"
+>
+  <header class="flex shrink-0 items-center gap-1 border-b border-slate-800 px-1.5 py-1.5">
+    <button
+      type="button"
+      class="grid size-6 shrink-0 place-items-center rounded text-slate-400 transition hover:bg-slate-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      [attr.aria-label]="collapsed() ? 'Expand character rail' : 'Collapse character rail'"
+      [attr.aria-expanded]="!collapsed()"
+      (click)="collapsed.set(!collapsed())"
+    >
+      <span aria-hidden="true" class="text-[10px]">{{ collapsed() ? '›' : '‹' }}</span>
+    </button>
+
+    @if (!collapsed()) {
+      <h2 class="min-w-0 flex-1 truncate text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        Party
+      </h2>
+      <button
+        type="button"
+        class="shrink-0 rounded px-1 text-[10px] text-sky-400 transition hover:bg-slate-800 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        [attr.aria-expanded]="showCreate()"
+        (click)="showCreate.set(!showCreate())"
+      >
+        + PC
+      </button>
+    }
+  </header>
+
+  @if (!collapsed()) {
+    @if (error()) {
+      <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[10px] text-rose-300" role="alert">
+        {{ error() }}
+      </p>
+    }
+    @if (status()) {
+      <p class="shrink-0 border-b border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[10px] text-emerald-300" role="status">
+        {{ status() }}
+      </p>
+    }
+
+    @if (showCreate()) {
+      <div class="shrink-0 space-y-1 border-b border-slate-800 bg-slate-950/40 p-2">
+        <label for="pc-name" class="sr-only">Character name</label>
+        <input
+          id="pc-name"
+          type="text"
+          placeholder="Character name"
+          class="w-full rounded border border-slate-700 bg-slate-950 px-1.5 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+          [value]="newName()"
+          (input)="newName.set($any($event.target).value)"
+          (keydown.enter)="createCharacter()"
+        />
+        <app-image-upload
+          label="Portrait"
+          placeholder="Upload portrait"
+          [imageUri]="newImagePreview()"
+          (fileChosen)="onNewImageChosen($event)"
+        />
+        <button
+          type="button"
+          class="w-full rounded bg-sky-600 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="!newName().trim()"
+          (click)="createCharacter()"
+        >
+          Create
+        </button>
+      </div>
+    }
+
+    <div class="min-h-0 flex-1 space-y-2 overflow-y-auto p-2">
+      @if (characters().length === 0) {
+        <p class="text-[10px] italic text-slate-600">
+          No player characters yet. Add one to track their resources here.
+        </p>
+      } @else {
+        @for (character of characters(); track trackCharacter($index, character)) {
+          <article class="group/pc rounded-lg border border-slate-800 bg-slate-950/50 p-1.5 transition hover:border-sky-700">
+            <div class="flex items-start gap-1.5">
+              <app-image-upload
+                [compact]="true"
+                label="Portrait"
+                [imageUri]="character.imageUri"
+                [alt]="character.name"
+                (fileChosen)="onPortraitChosen(character, $event)"
+              />
+
+              <div class="min-w-0 flex-1">
+                <button
+                  type="button"
+                  class="block w-full truncate text-left text-[11px] font-medium text-slate-100 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  (click)="openSheet(character)"
+                >
+                  {{ character.name }}
+                </button>
+
+                <div class="mt-0.5 flex items-center gap-1">
+                  <button
+                    type="button"
+                    class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] transition hover:border-amber-500 hover:text-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+                    [disabled]="!canAddToEncounter()"
+                    [attr.aria-label]="'Add ' + character.name + ' to the encounter'"
+                    [title]="canAddToEncounter() ? 'Add to encounter' : 'Select a session first'"
+                    (click)="addToEncounter(character, $event)"
+                  >
+                    <app-icon name="ra:crossed-swords" [size]="12" />
+                  </button>
+                  <button
+                    type="button"
+                    class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    [attr.aria-label]="'Open ' + character.name + ' sheet'"
+                    (click)="openSheet(character)"
+                  >
+                    <app-icon name="lu:file-text" [size]="12" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            @if ((character.resources ?? []).length > 0) {
+              <div class="mt-1.5 space-y-1">
+                @for (resource of character.resources ?? []; track resource.id) {
+                  <app-resource-bar
+                    [resource]="resource"
+                    (adjusted)="onResourceAdjusted(character, $event)"
+                  />
+                }
+              </div>
+            } @else {
+              <p class="mt-1 text-[10px] italic text-slate-600">No resources.</p>
+            }
+          </article>
+        }
+      }
+    </div>
+  } @else {
+    <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto py-2">
+      @for (character of characters(); track trackCharacter($index, character)) {
+        <button
+          type="button"
+          class="mx-auto block focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [attr.aria-label]="'Open ' + character.name + ' sheet'"
+          [title]="character.name"
+          (click)="openSheet(character)"
+        >
+          @if (character.imageUri) {
+            <img
+              [src]="portraitUrl(character.imageUri)"
+              [alt]="''"
+              class="size-7 rounded border border-slate-700 object-cover"
+              loading="lazy"
+            />
+          } @else {
+            <span class="grid size-7 place-items-center rounded border border-slate-700 bg-slate-900 text-slate-400" aria-hidden="true">
+              <app-icon [name]="character.iconId ?? ''" [size]="16" />
+            </span>
+          }
+        </button>
+      }
+    </div>
+  }
+</aside>
