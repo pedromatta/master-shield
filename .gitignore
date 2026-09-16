@@ -40,6 +40,18 @@ bld/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
+# User-uploaded media is stored under wwwroot at runtime and must not be committed.
+MasterShield/wwwroot/uploads/
+
+# AI assistant metadata and scratch files are never committed.
+AGENTS.md
+CLAUDE.md
+.cursorrules
+.windsurfrules
+.clinerules
+.aider*
+prompts/
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
