@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MasterShield.Models;
 
 public class Session
@@ -10,6 +12,7 @@ public class Session
     public string Log { get; set; } = string.Empty;
 
 
+    [JsonIgnore]
     public Campaign Campaign { get; set; } = null!;
     public ICollection<Encounter> Encounters { get; set; } = new List<Encounter>();
     public ICollection<Note> Notes { get; set; } = new List<Note>();

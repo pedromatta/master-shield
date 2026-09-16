@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MasterShield.Models;
 
 public class Resource
@@ -9,6 +11,7 @@ public class Resource
     public int MaxValue { get; set; }
     public string ColorHwx { get; set; } = "#000000";
 
+    [JsonIgnore]
     public Actor Actor { get; set; } = null!;
 
     public Dictionary<string, object> SystemData { get; set; } = new();
