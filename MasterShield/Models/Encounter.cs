@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MasterShield.Models;
 
 public class Encounter
@@ -8,6 +10,7 @@ public class Encounter
     public bool IsActive { get; set; }
     public int CurrentRound { get; set; }
 
+    [JsonIgnore]
     public Session Session { get; set; } = null!;
     public ICollection<EncounterParticipant> Participants { get; set; } = new List<EncounterParticipant>();
 }
