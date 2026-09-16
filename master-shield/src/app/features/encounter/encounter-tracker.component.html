@@ -1,0 +1,173 @@
+<section class="flex h-full min-h-0 flex-col bg-slate-900/40">
+  <header class="flex shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900/80 px-2 py-1.5">
+    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300">Encounter</h2>
+
+    @if (sessionEncounters().length > 0) {
+      <label class="sr-only" for="encounter-select">Encounter</label>
+      <select
+        id="encounter-select"
+        class="max-w-[12rem] rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+        [value]="encounter()?.id ?? ''"
+        (change)="switchEncounter($any($event.target).value)"
+      >
+        @for (option of sessionEncounters(); track option.id) {
+          <option [value]="option.id">
+            {{ option.name }}{{ option.isActive ? ' •' : '' }}
+          </option>
+        }
+      </select>
+    }
+
+    @if (encounter(); as e) {
+      @if (e.isActive) {
+        <span class="shrink-0 rounded bg-emerald-950 px-1.5 text-[10px] font-medium text-emerald-400">active</span>
+      }
+
+      <div class="ml-auto flex shrink-0 items-center gap-1">
+        <button
+          type="button"
+          class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          [disabled]="participants().length === 0"
+          aria-label="Previous turn"
+          (click)="previousTurn()"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          [disabled]="participants().length === 0"
+          aria-label="Next turn"
+          (click)="nextTurn()"
+        >
+          ›
+        </button>
+        <div class="mx-1 flex items-center gap-0.5 rounded border border-slate-700 px-1">
+          <button
+            type="button"
+            class="grid size-5 place-items-center text-[10px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+            [disabled]="pending() || e.currentRound <= 1"
+            aria-label="Previous round"
+            (click)="previousRound()"
+          >
+            «
+          </button>
+          <span class="px-1 text-[10px] text-slate-300">Round {{ e.currentRound }}</span>
+          <button
+            type="button"
+            class="grid size-5 place-items-center text-[10px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+            [disabled]="pending()"
+            aria-label="Next round"
+            (click)="advanceRound()"
+          >
+            »
+          </button>
+        </div>
+      </div>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+      {{ error() }}
+    </p>
+  }
+
+  @if (encounter(); as e) {
+    <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2">
+      @if (loading()) {
+        <p class="p-2 text-xs text-slate-500">Loading participants…</p>
+      } @else if (participants().length === 0) {
+        <p class="p-2 text-xs italic text-slate-500">
+          No combatants yet. Add actors from this campaign below, or from a character's sheet.
+        </p>
+      } @else {
+        @for (participant of participants(); track trackParticipant($index, participant)) {
+          <div
+            (dragover)="onDragOver($index, $event)"
+            (drop)="onDrop($index, $event)"
+          >
+            <app-participant-card
+              [participant]="participant"
+              [actor]="actorOf(participant)"
+              [isCurrentTurn]="participant.id === currentTurnId()"
+              [isDropTarget]="dropIndex() === $index && dragId() !== participant.id"
+              (stateChange)="onStateChange($event)"
+              (remove)="removeParticipant($event)"
+              (openSheet)="openSheet(participant)"
+              (moveUp)="moveUp($index)"
+              (moveDown)="moveDown($index)"
+              (dragStart)="onDragStart(participant.id, $event)"
+              (dragEnd)="onDragEnd()"
+              (resourceAdjusted)="onResourceAdjusted(participant, $event)"
+            />
+          </div>
+        }
+      }
+    </div>
+
+    <footer class="shrink-0 border-t border-slate-800 bg-slate-900/80 p-2">
+      <div class="flex items-center gap-1.5">
+        <button
+          type="button"
+          class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [attr.aria-expanded]="showAdd()"
+          (click)="showAdd.set(!showAdd())"
+        >
+          + Combatant
+        </button>
+        @if (pending()) {
+          <span class="text-[10px] text-sky-400">syncing…</span>
+        }
+      </div>
+
+      @if (showAdd()) {
+        <div class="mt-1.5 flex items-end gap-1.5">
+          <div class="min-w-0 flex-1">
+            <label for="encounter-actor" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+              Actor
+            </label>
+            <select
+              id="encounter-actor"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              [value]="selectedActorId()"
+              (change)="selectedActorId.set($any($event.target).value)"
+            >
+              <option value="">— select actor —</option>
+              @for (actor of availableActors(); track actor.id) {
+                <option [value]="actor.id">{{ actor.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="w-16">
+            <label for="encounter-initiative" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+              Init
+            </label>
+            <input
+              id="encounter-initiative"
+              type="number"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              [value]="newInitiative()"
+              (input)="newInitiative.set(+$any($event.target).value)"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="rounded bg-slate-700 px-3 py-1 text-[11px] font-medium text-white transition hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+            [disabled]="!selectedActorId() || pending()"
+            (click)="addParticipant()"
+          >
+            Add
+          </button>
+        </div>
+      }
+    </footer>
+  } @else {
+    <p class="p-3 text-xs italic text-slate-500">
+      No encounter selected. Create one from a session, or add a character to a session's
+      encounter from its sheet.
+    </p>
+  }
+</section>

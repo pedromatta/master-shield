@@ -1,0 +1,126 @@
+@let p = participant();
+@let a = actor();
+
+<article
+  class="rounded-lg border bg-slate-900/70 p-2 transition"
+  [class]="
+    isCurrentTurn()
+      ? 'border-sky-500 shadow-[0_0_0_1px_rgba(14,165,233,0.4)]'
+      : isDropTarget()
+        ? 'border-amber-500'
+        : 'border-slate-800 hover:border-slate-700'
+  "
+>
+  <div class="flex items-start gap-2">
+    <!-- Drag handle -->
+    <span
+      class="mt-1 shrink-0 cursor-grab select-none text-[10px] leading-none text-slate-600 active:cursor-grabbing"
+      aria-hidden="true"
+      title="Drag to reorder"
+    >
+      ⠿
+    </span>
+
+    <button
+      type="button"
+      class="flex size-10 shrink-0 flex-col items-center justify-center overflow-hidden rounded bg-slate-950 font-mono leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      [attr.aria-label]="'Initiative ' + p.initiative + '. Open sheet.'"
+      [disabled]="!a"
+      (click)="onOpenSheet()"
+    >
+      @if (portraitUri()) {
+        <img [src]="portraitUri()" [alt]="''" class="size-10 object-cover" loading="lazy" />
+      } @else {
+        <span class="text-sm font-semibold text-slate-100">{{ p.initiative }}</span>
+        <span class="text-[9px] uppercase tracking-wide text-slate-500">init</span>
+      }
+    </button>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-1.5">
+        <h4 class="min-w-0 flex-1 truncate text-sm font-semibold text-slate-100">
+          {{ a?.name ?? 'Unknown actor' }}
+        </h4>
+        @if (p.isHiden) {
+          <span
+            class="shrink-0 rounded bg-violet-950 px-1.5 text-[10px] font-medium text-violet-300"
+            title="Hidden from players"
+          >
+            hidden
+          </span>
+        }
+        @if (isCurrentTurn()) {
+          <span class="shrink-0 rounded bg-sky-950 px-1.5 text-[10px] font-medium text-sky-300">turn</span>
+        }
+      </div>
+
+      <p class="mt-0.5 flex items-center gap-2 text-[11px] text-slate-400">
+        <span class="text-slate-600">{{ effectCount() }} effect(s)</span>
+        <span class="ml-auto text-slate-600">init {{ p.initiative }}</span>
+      </p>
+
+      <!-- Controls -->
+      <div class="mt-1.5 flex items-center gap-1">
+        <button
+          type="button"
+          class="rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[10px] text-slate-400 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          [disabled]="!a"
+          [attr.aria-label]="'Open ' + (a?.name ?? 'actor') + ' sheet'"
+          (click)="onOpenSheet()"
+        >
+          <app-icon name="lu:file-text" [size]="11" /> Sheet
+        </button>
+
+        <span class="ml-auto flex items-center gap-0.5">
+          <button
+            type="button"
+            class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            [attr.aria-label]="'Move ' + (a?.name ?? 'participant') + ' up'"
+            (click)="moveUp.emit()"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            [attr.aria-label]="'Move ' + (a?.name ?? 'participant') + ' down'"
+            (click)="moveDown.emit()"
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            class="grid size-5 place-items-center rounded border border-transparent text-[10px] text-slate-500 transition hover:border-rose-800 hover:bg-rose-950 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            [attr.aria-label]="'Remove ' + (a?.name ?? 'participant') + ' from encounter'"
+            (click)="onRemove()"
+          >
+            <app-icon name="lu:x" [size]="11" />
+          </button>
+        </span>
+      </div>
+
+      <!-- Encounter-side resource control -->
+      @if (resources().length > 0) {
+        <div class="mt-1.5 space-y-1 rounded border border-slate-800 bg-slate-950/60 p-1.5">
+          @for (resource of resources(); track resource.id) {
+            <app-resource-bar
+              [resource]="resource"
+              [expressionInput]="true"
+              (adjusted)="resourceAdjusted.emit($event)"
+            />
+          }
+        </div>
+      } @else if (a) {
+        <p class="mt-1.5 text-[10px] italic text-slate-600">
+          No resources shown. Pick them in the actor sheet.
+        </p>
+      }
+
+      <app-effect-injector
+        [participantId]="p.id"
+        [effects]="p.temporaryEffects"
+        (effectsChange)="onEffectsChange($event)"
+      />
+    </div>
+  </div>
+</article>
