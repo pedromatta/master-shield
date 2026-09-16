@@ -8,4 +8,7 @@ public class GameSystem
 
     public ICollection<Campaign> Campaigns { get; set; } = new List<Campaign>();
     public ICollection<SystemBlueprint> Blueprints { get; set; } = new List<SystemBlueprint>();
+
+    /// <summary>Ready-made actors, locations, rules and notes campaigns can adopt.</summary>
+    public ICollection<SystemEntityTemplate> Templates { get; set; } = new List<SystemEntityTemplate>();
 }
