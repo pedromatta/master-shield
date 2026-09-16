@@ -1,0 +1,272 @@
+@if (actor(); as a) {
+  <div class="space-y-3 p-3">
+    @if (error()) {
+      <p class="rounded border border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+        {{ error() }}
+      </p>
+    }
+    @if (status()) {
+      <p class="rounded border border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[11px] text-emerald-300" role="status">
+        {{ status() }}
+      </p>
+    }
+
+    <!-- Tab bar keeps each group of controls uncluttered. -->
+    <nav class="flex gap-1 border-b border-slate-800" aria-label="Sheet sections">
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          class="-mb-px rounded-t border-b-2 px-2.5 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [class]="
+            activeTab() === tab.id
+              ? 'border-sky-500 text-sky-300'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          "
+          [attr.aria-selected]="activeTab() === tab.id"
+          (click)="activeTab.set(tab.id)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+
+    @if (activeTab() === 'overview') {
+    <!-- Identity -->
+    <div class="flex items-start gap-3">
+      <div class="shrink-0 space-y-2">
+        <app-icon-picker
+          [value]="a.iconId ?? ''"
+          [imageUri]="a.imageUri"
+          label="Portrait"
+          (iconChange)="onIconChange($event)"
+          (imageChosen)="onImageChosen($event)"
+        />
+      </div>
+
+      <div class="min-w-0 flex-1 space-y-1.5">
+        <div class="grid grid-cols-2 gap-2">
+          <div class="col-span-2">
+            <label for="sheet-name" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+              Name
+            </label>
+            <input
+              id="sheet-name"
+              type="text"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm font-medium text-slate-100 focus:border-sky-500 focus:outline-none"
+              [value]="a.name"
+              (change)="saveField('name', $any($event.target).value)"
+            />
+          </div>
+
+          <div class="col-span-2">
+            <label for="sheet-type" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+              Type
+            </label>
+            <select
+              id="sheet-type"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+              [value]="a.type"
+              (change)="saveField('type', $any($event.target).value)"
+            >
+              <option value="PlayerCharacter">Player Character</option>
+              <option value="NonPlayerCharacter">NPC</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1 pt-0.5">
+          <button
+            type="button"
+            class="rounded bg-amber-700 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            (click)="addToEncounter()"
+          >
+            <app-icon name="ra:crossed-swords" [size]="12" /> Add to encounter
+          </button>
+          <button
+            type="button"
+            class="rounded border border-slate-700 px-2 py-1 text-[11px] text-rose-400 transition hover:border-rose-700 hover:bg-rose-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            (click)="deleteActor()"
+          >
+            Delete
+          </button>
+          @if (saving()) {
+            <span class="text-[10px] text-sky-400">saving…</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <section class="rounded border border-slate-800 bg-slate-950/50 p-2">
+      <div class="mb-1.5 flex items-center justify-between">
+        <h3 class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Resources</h3>
+        <button
+          type="button"
+          class="text-[10px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [attr.aria-expanded]="showResourceForm()"
+          (click)="showResourceForm.set(!showResourceForm())"
+        >
+          + Resource
+        </button>
+      </div>
+
+      @if (showResourceForm()) {
+        <div class="mb-2 flex items-end gap-1.5">
+          <div class="min-w-0 flex-1">
+            <label for="resource-name" class="mb-0.5 block text-[10px] text-slate-500">Name</label>
+            <input
+              id="resource-name"
+              type="text"
+              placeholder="HP"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-1.5 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              [value]="newResourceName()"
+              (input)="newResourceName.set($any($event.target).value)"
+              (keydown.enter)="addResource()"
+            />
+          </div>
+          <div class="w-16">
+            <label for="resource-max" class="mb-0.5 block text-[10px] text-slate-500">Max</label>
+            <input
+              id="resource-max"
+              type="number"
+              min="1"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-1.5 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              [value]="newResourceMax()"
+              (input)="newResourceMax.set(+$any($event.target).value)"
+            />
+          </div>
+          <label class="sr-only" for="resource-color">Colour</label>
+          <input
+            id="resource-color"
+            type="color"
+            class="h-7 w-8 cursor-pointer rounded border border-slate-700 bg-slate-950"
+            [value]="newResourceColor()"
+            (input)="newResourceColor.set($any($event.target).value)"
+          />
+          <button
+            type="button"
+            class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+            [disabled]="!newResourceName().trim()"
+            (click)="addResource()"
+          >
+            Add
+          </button>
+        </div>
+      }
+
+      @if ((a.resources ?? []).length > 0) {
+        <div class="space-y-1.5">
+          @for (resource of a.resources ?? []; track trackResource($index, resource.id)) {
+            <div class="group/row flex items-center gap-2">
+              <label
+                class="flex shrink-0 cursor-pointer items-center gap-1 text-[9px] text-slate-500"
+                [title]="'Show ' + resource.nome + ' in the encounter tracker'"
+              >
+                <input
+                  type="checkbox"
+                  class="size-3 accent-sky-500"
+                  [checked]="showsInEncounter(resource.id)"
+                  [attr.aria-label]="'Show ' + resource.nome + ' in encounters'"
+                  (change)="toggleEncounterResource(resource.id)"
+                />
+                <span class="hidden group-hover/row:inline">enc</span>
+              </label>
+              <div class="min-w-0 flex-1">
+                <app-resource-bar [resource]="resource" (adjusted)="onResourceAdjusted($event)" />
+              </div>
+              <button
+                type="button"
+                class="shrink-0 rounded px-1 text-[10px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/row:opacity-100"
+                [attr.aria-label]="'Delete resource ' + resource.nome"
+                (click)="deleteResource(resource.id)"
+              >
+                <app-icon name="lu:x" [size]="11" />
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-[10px] italic text-slate-600">No resources defined.</p>
+      }
+    </section>
+
+    <!-- Tags -->
+    <app-tag-editor category="Actor" [selected]="tags()" (selectedChange)="onTagsChange($event)" />
+
+    <!-- Linked rules: a character's abilities, an NPC's tactics. -->
+    <app-rule-picker [selectedIds]="linkedRuleIds()" (selectedIdsChange)="onRulesChange($event)" />
+    }
+
+    @if (activeTab() === 'details') {
+    <!-- Notes -->
+    <div>
+      <label for="sheet-notes" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+        Notes
+      </label>
+      <textarea
+        id="sheet-notes"
+        rows="3"
+        class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-sky-500 focus:outline-none"
+        [value]="a.notes"
+        (change)="saveField('notes', $any($event.target).value)"
+      ></textarea>
+    </div>
+
+    <!-- Attachments -->
+    <section class="rounded border border-slate-800 bg-slate-950/50 p-2">
+      <div class="mb-1.5 flex items-center justify-between">
+        <h3 class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Attachments</h3>
+        <label class="cursor-pointer text-[10px] text-sky-400 transition hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
+          + Upload
+          <input
+            type="file"
+            class="sr-only"
+            (change)="onAttachmentChosen($any($event.target).files[0]); $any($event.target).value = ''"
+          />
+        </label>
+      </div>
+
+      @if ((a.attachments ?? []).length > 0) {
+        <ul class="space-y-1">
+          @for (attachment of a.attachments ?? []; track attachment.id) {
+            <li class="group/att flex items-center gap-2 text-[11px]">
+              <a
+                class="min-w-0 flex-1 truncate text-sky-300 transition hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                [href]="attachmentUrl(attachment.fileUri)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ attachment.fileName }}
+              </a>
+              <span class="shrink-0 text-[9px] text-slate-600">
+                {{ (attachment.sizeInBytes / 1024).toFixed(0) }} KB
+              </span>
+              <button
+                type="button"
+                class="shrink-0 rounded px-1 text-[10px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/att:opacity-100"
+                [attr.aria-label]="'Remove attachment ' + attachment.fileName"
+                (click)="removeAttachment(attachment)"
+              >
+                <app-icon name="lu:x" [size]="11" />
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="text-[10px] italic text-slate-600">No attachments.</p>
+      }
+    </section>
+    }
+
+    @if (activeTab() === 'system') {
+    <!-- System data -->
+    <app-system-data-editor
+      [systemData]="a.systemData"
+      label="System data"
+      (systemDataChange)="saveSystemData($event)"
+    />
+    }
+  </div>
+} @else {
+  <p class="p-3 text-xs italic text-slate-500">This actor no longer exists.</p>
+}
