@@ -1,0 +1,48 @@
+<div class="space-y-1" [class.text-center]="compact()">
+  @if (!compact()) {
+    <span class="block text-[10px] uppercase tracking-wider text-slate-500">{{ label() }}</span>
+  }
+
+  <label
+    class="group relative flex cursor-pointer items-center justify-center overflow-hidden rounded border border-dashed border-slate-700 bg-slate-950/60 transition hover:border-sky-600 focus-within:ring-2 focus-within:ring-sky-500"
+    [class.h-10]="compact()"
+    [class.w-10]="compact()"
+    [class.h-24]="!compact()"
+    [class.w-24]="!compact()"
+    [class.cursor-not-allowed]="disabled()"
+    [class.opacity-50]="disabled()"
+  >
+    @if (resolvedUri()) {
+      <img
+        [src]="resolvedUri()"
+        [alt]="alt()"
+        class="h-full w-full object-cover"
+        loading="lazy"
+      />
+    } @else {
+      <span
+        class="px-1 text-center text-[10px] leading-tight text-slate-500"
+        [class.text-base]="compact()"
+      >
+        {{ compact() ? '+' : placeholder() }}
+      </span>
+    }
+
+    <span
+      class="absolute inset-0 hidden items-center justify-center bg-slate-950/70 text-[10px] font-medium text-sky-300 group-hover:flex"
+      aria-hidden="true"
+    >
+      Upload
+    </span>
+
+    <input
+      type="file"
+      accept="image/*"
+      class="sr-only"
+      [id]="inputId"
+      [disabled]="disabled()"
+      (change)="onFileChosen($event)"
+    />
+    <span class="sr-only">{{ label() }} file picker</span>
+  </label>
+</div>
