@@ -2,13 +2,13 @@
 @let a = actor();
 
 <article
-  class="rounded-lg border bg-slate-900/70 p-2 transition"
+  class="rounded-lg border bg-surface-panel p-2 transition"
   [class]="
     isCurrentTurn()
-      ? 'border-sky-500 shadow-[0_0_0_1px_rgba(14,165,233,0.4)]'
+      ? 'border-sky-500 ring-1 ring-sky-500/40'
       : isDropTarget()
         ? 'border-amber-500'
-        : 'border-slate-800 hover:border-slate-700'
+        : 'border-slate-700 hover:border-slate-700'
   "
 >
   <div class="flex items-start gap-2">
@@ -68,7 +68,7 @@
           [attr.aria-label]="'Open ' + (a?.name ?? 'actor') + ' sheet'"
           (click)="onOpenSheet()"
         >
-          <app-icon name="lu:file-text" [size]="11" /> Sheet
+          <span class="inline-flex items-center gap-1"><app-icon name="lu:file-text" [size]="11" /><span>Sheet</span></span>
         </button>
 
         <span class="ml-auto flex items-center gap-0.5">
@@ -101,7 +101,7 @@
 
       <!-- Encounter-side resource control -->
       @if (resources().length > 0) {
-        <div class="mt-1.5 space-y-1 rounded border border-slate-800 bg-slate-950/60 p-1.5">
+        <div class="mt-1.5 space-y-1 rounded border border-slate-700 bg-slate-950 p-1.5">
           @for (resource of resources(); track resource.id) {
             <app-resource-bar
               [resource]="resource"

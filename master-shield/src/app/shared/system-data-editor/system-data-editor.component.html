@@ -1,7 +1,7 @@
-<section class="rounded-lg border border-slate-700 bg-slate-900/60 p-3" [attr.aria-label]="label()">
+<section class="rounded-lg border border-slate-700 bg-surface-panel p-3" [attr.aria-label]="label()">
   <header class="mb-2 flex items-center justify-between gap-2">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">{{ label() }}</h3>
-    <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
+    <span class="rounded bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
       {{ entries().length }} field{{ entries().length === 1 ? '' : 's' }}
     </span>
   </header>
@@ -11,14 +11,14 @@
       No system fields yet. Add one to describe this entity for its game system.
     </p>
   } @else {
-    <ul class="divide-y divide-slate-800">
+    <ul class="divide-y divide-slate-700">
       @for (entry of entries(); track trackKey($index, entry)) {
         <li class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] items-center gap-2 py-1.5">
           <label class="sr-only" [attr.for]="'sd-key-' + entry.key">Field name</label>
           <input
             [id]="'sd-key-' + entry.key"
             type="text"
-            class="w-full rounded border border-transparent bg-transparent px-1.5 py-1 text-xs font-medium text-slate-200 hover:border-slate-700 focus:border-sky-500 focus:bg-slate-900 focus:outline-none disabled:opacity-60"
+            class="w-full rounded border border-transparent bg-transparent px-1.5 py-1 text-xs font-medium text-slate-200 hover:border-slate-700 focus:border-sky-500 focus:bg-surface-panel focus:outline-none disabled:opacity-60"
             [value]="entry.key"
             [disabled]="readonlyMode()"
             (change)="renameKey(entry.key, $any($event.target).value)"
@@ -29,7 +29,7 @@
               <label class="flex items-center gap-2 text-xs text-slate-300">
                 <input
                   type="checkbox"
-                  class="size-4 rounded border-slate-600 bg-slate-800 text-sky-500 focus:ring-sky-500 focus:ring-offset-0"
+                  class="size-4 rounded border-slate-600 bg-surface-raised text-sky-500 focus:ring-sky-500 focus:ring-offset-0"
                   [checked]="entry.value === true"
                   [disabled]="readonlyMode()"
                   (change)="updateBoolean(entry.key, $any($event.target).checked)"
@@ -72,7 +72,7 @@
   }
 
   @if (!readonlyMode()) {
-    <footer class="mt-2 flex items-center gap-2 border-t border-slate-800 pt-2">
+    <footer class="mt-2 flex items-center gap-2 border-t border-slate-700 pt-2">
       <label class="sr-only" for="system-data-new-key">New field name</label>
       <input
         id="system-data-new-key"

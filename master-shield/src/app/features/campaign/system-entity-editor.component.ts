@@ -18,6 +18,7 @@ import {
 import { ACTOR_TYPES } from '../../core/models/actor.model';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { ImageUploadComponent } from '../../shared/image-upload/image-upload.component';
+import { DEFAULT_RESOURCE_COLOR } from '../../core/theme/theme';
 
 /**
  * Full CRUD for the ready-made actors, locations, rules and notes a game system ships with,
@@ -231,7 +232,7 @@ export class SystemEntityEditorComponent {
     this.patch(entry, {
       resources: [
         ...entry.resources,
-        { nome: 'New resource', currentValue: 10, maxValue: 10, colorHwx: '#38bdf8' },
+        { nome: 'New resource', currentValue: 10, maxValue: 10, colorHwx: DEFAULT_RESOURCE_COLOR },
       ],
     });
   }

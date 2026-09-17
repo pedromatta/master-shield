@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ContentStoreService } from '../../../core/services/content-store.service';
 import { Counter } from '../../../core/models/content.model';
 import { IconComponent } from '../../../shared/icon/icon.component';
+import { DEFAULT_RESOURCE_COLOR } from '../../../core/theme/theme';
 
 /** Checkbox-style progress tracks (clocks, doom counters, ammo). */
 @Component({
@@ -21,7 +22,7 @@ export class CountersPanelComponent {
 
   protected readonly newName = signal('');
   protected readonly newBoxes = signal(4);
-  protected readonly newColor = signal('#38bdf8');
+  protected readonly newColor = signal(DEFAULT_RESOURCE_COLOR);
 
   protected readonly draftName = signal('');
   protected readonly draftBoxes = signal(4);

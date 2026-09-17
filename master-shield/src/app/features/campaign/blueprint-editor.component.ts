@@ -20,6 +20,7 @@ import {
 } from '../../core/models/content.model';
 import { ACTOR_TYPES } from '../../core/models/actor.model';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { DEFAULT_RESOURCE_COLOR } from '../../core/theme/theme';
 
 /**
  * Blueprint editor for one game system. A blueprint dictates how every new entity of its
@@ -148,7 +149,7 @@ export class BlueprintEditorComponent {
     this.patch({
       resources: [
         ...blueprint.resources,
-        { nome: 'New resource', maxValue: 10, currentValue: 10, colorHwx: '#38bdf8', showInOverview: true },
+        { nome: 'New resource', maxValue: 10, currentValue: 10, colorHwx: DEFAULT_RESOURCE_COLOR, showInOverview: true },
       ],
     });
   }

@@ -17,8 +17,13 @@ import { LUCIDE_COMPONENTS } from './lucide-icons';
   templateUrl: './icon.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'inline-flex shrink-0 items-center justify-center',
+    // `inline-flex` + `align-middle` keeps the icon centred on the text baseline when it
+    // sits inside a run of text, and `leading-none` stops the glyph from inflating the
+    // line box. Hosts that lay their children out with flex still centre it.
+    class: 'inline-flex shrink-0 items-center justify-center align-middle leading-none',
     '[style.font-size.px]': 'size()',
+    '[style.width.px]': 'size()',
+    '[style.height.px]': 'size()',
   },
 })
 export class IconComponent {

@@ -16,7 +16,7 @@
       @for (tag of allTags(); track tag.id) {
         <li
           class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px]"
-          [class]="isSelected(tag) ? 'bg-slate-800 font-medium' : 'border-slate-700'"
+          [class]="isSelected(tag) ? 'bg-surface-raised font-medium' : 'border-slate-700'"
           [style]="isSelected(tag) ? chipStyle(tag) : ''"
         >
           <button

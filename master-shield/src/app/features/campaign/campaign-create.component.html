@@ -1,5 +1,5 @@
 <section
-  class="mx-auto w-full max-w-lg rounded-lg border border-slate-800 bg-slate-900/70 p-4"
+  class="mx-auto w-full max-w-lg rounded-lg border border-slate-700 bg-surface-panel p-4"
   [class.shadow-2xl]="asDialog()"
 >
   <header class="mb-3">
@@ -27,7 +27,7 @@
   }
 
   @if (needsAccount()) {
-    <fieldset class="mb-4 rounded border border-slate-800 p-3">
+    <fieldset class="mb-4 rounded border border-slate-700 p-3">
       <legend class="px-1 text-[10px] uppercase tracking-wider text-slate-500">
         Owner account
       </legend>
@@ -154,7 +154,7 @@
       }
 
       @if (showNewSystem()) {
-        <div class="mt-2 flex items-end gap-2 rounded border border-slate-800 bg-slate-950/60 p-2">
+        <div class="mt-2 flex items-end gap-2 rounded border border-slate-700 bg-slate-950 p-2">
           <div class="min-w-0 flex-1">
             <label
               for="new-system-name"

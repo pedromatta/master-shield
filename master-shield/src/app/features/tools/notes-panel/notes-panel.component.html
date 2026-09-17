@@ -1,6 +1,6 @@
 <div class="flex h-full min-h-0 flex-col">
   <!-- Toolbar -->
-  <div class="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-800 bg-slate-900/60 px-2 py-1.5">
+  <div class="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-700 bg-surface-panel px-2 py-1.5">
     <h2 class="mr-auto text-xs font-semibold uppercase tracking-wider text-slate-300">Notes</h2>
 
     <label class="sr-only" for="note-search">Search notes</label>
@@ -20,7 +20,7 @@
             <button
               type="button"
               class="rounded-full border px-1.5 py-0.5 text-[9px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-              [class]="isTagActive(tag.id) ? 'bg-slate-800 font-medium' : 'border-slate-700 text-slate-500'"
+              [class]="isTagActive(tag.id) ? 'bg-surface-raised font-medium' : 'border-slate-700 text-slate-500'"
               [style]="isTagActive(tag.id) ? 'border-color:' + tag.colorHex + ';color:' + tag.colorHex : ''"
               [attr.aria-pressed]="isTagActive(tag.id)"
               (click)="toggleTagFilter(tag.id)"
@@ -56,7 +56,7 @@
   }
 
   @if (showCategoryForm()) {
-    <div class="flex shrink-0 items-center gap-1.5 border-b border-slate-800 bg-slate-950/40 p-2">
+    <div class="flex shrink-0 items-center gap-1.5 border-b border-slate-700 bg-slate-950 p-2">
       <app-image-upload
         [compact]="true"
         label="Category icon"
@@ -87,29 +87,29 @@
   <!-- Accordion: All, then each category, then Uncategorised. -->
   <div class="min-h-0 flex-1 overflow-y-auto p-2">
     <ul class="space-y-1.5">
-      <li class="overflow-hidden rounded border border-slate-800 bg-slate-900/40">
+      <li class="overflow-hidden rounded border border-slate-700 bg-surface-panel">
         <button
           type="button"
           class="flex w-full items-center gap-2 px-2 py-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-          [class]="isCategorySelected(null) ? 'bg-slate-800/60' : 'hover:bg-slate-900'"
+          [class]="isCategorySelected(null) ? 'bg-surface-raised' : 'hover:bg-surface-panel'"
           [attr.aria-expanded]="isCategorySelected(null)"
           (click)="selectCategory(null)"
         >
           <span class="shrink-0 text-[10px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(null)" aria-hidden="true">▶</span>
           <app-icon name="lu:folder" [size]="13" />
           <span class="min-w-0 flex-1 truncate text-xs font-medium" [class]="isCategorySelected(null) ? 'text-sky-300' : 'text-slate-200'">All notes</span>
-          <span class="shrink-0 rounded bg-slate-800 px-1 text-[9px] text-slate-400">{{ countForCategory(null) }}</span>
+          <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory(null) }}</span>
         </button>
         @if (isCategorySelected(null)) {
-          <div class="border-t border-slate-800 p-2">
+          <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
             <ng-container *ngTemplateOutlet="editorTpl" />
           </div>
         }
       </li>
 
       @for (category of categories(); track trackCategory($index, category)) {
-        <li class="overflow-hidden rounded border border-slate-800 bg-slate-900/40">
-          <div class="group/cat flex items-center gap-1.5 px-2 py-1.5" [class]="isCategorySelected(category.id) ? 'bg-slate-800/60' : 'hover:bg-slate-900'">
+        <li class="overflow-hidden rounded border border-slate-700 bg-surface-panel">
+          <div class="group/cat flex items-center gap-1.5 px-2 py-1.5" [class]="isCategorySelected(category.id) ? 'bg-surface-raised' : 'hover:bg-surface-panel'">
             <button
               type="button"
               class="flex min-w-0 flex-1 items-center gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
@@ -123,7 +123,7 @@
                 <app-icon name="lu:notebook" [size]="13" />
               }
               <span class="min-w-0 flex-1 truncate text-xs font-medium" [class]="isCategorySelected(category.id) ? 'text-sky-300' : 'text-slate-200'">{{ category.name }}</span>
-              <span class="shrink-0 rounded bg-slate-800 px-1 text-[9px] text-slate-400">{{ countForCategory(category.id) }}</span>
+              <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory(category.id) }}</span>
             </button>
             <app-image-upload
               [compact]="true"
@@ -142,28 +142,28 @@
             </button>
           </div>
           @if (isCategorySelected(category.id)) {
-            <div class="border-t border-slate-800 p-2">
+            <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
               <ng-container *ngTemplateOutlet="editorTpl" />
             </div>
           }
         </li>
       }
 
-      <li class="overflow-hidden rounded border border-slate-800 bg-slate-900/40">
+      <li class="overflow-hidden rounded border border-slate-700 bg-surface-panel">
         <button
           type="button"
           class="flex w-full items-center gap-2 px-2 py-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-          [class]="isCategorySelected('uncategorised') ? 'bg-slate-800/60' : 'hover:bg-slate-900'"
+          [class]="isCategorySelected('uncategorised') ? 'bg-surface-raised' : 'hover:bg-surface-panel'"
           [attr.aria-expanded]="isCategorySelected('uncategorised')"
           (click)="selectCategory('uncategorised')"
         >
           <span class="shrink-0 text-[10px] text-slate-500 transition" [class.rotate-90]="isCategorySelected('uncategorised')" aria-hidden="true">▶</span>
           <app-icon name="lu:file-text" [size]="13" />
           <span class="min-w-0 flex-1 truncate text-xs font-medium italic" [class]="isCategorySelected('uncategorised') ? 'text-sky-300' : 'text-slate-400'">Uncategorised</span>
-          <span class="shrink-0 rounded bg-slate-800 px-1 text-[9px] text-slate-400">{{ countForCategory('uncategorised') }}</span>
+          <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory('uncategorised') }}</span>
         </button>
         @if (isCategorySelected('uncategorised')) {
-          <div class="border-t border-slate-800 p-2">
+          <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
             <ng-container *ngTemplateOutlet="editorTpl" />
           </div>
         }
@@ -184,7 +184,7 @@
                 <button
                   type="button"
                   class="w-full truncate rounded px-1.5 py-1 text-left text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-                  [class]="note.id === selectedNoteId() ? 'bg-slate-800 text-sky-300' : 'text-slate-400 hover:bg-slate-900'"
+                  [class]="note.id === selectedNoteId() ? 'bg-surface-raised text-sky-300' : 'text-slate-400 hover:bg-surface-panel'"
                   [attr.aria-current]="note.id === selectedNoteId() ? 'true' : null"
                   (click)="selectedNoteId.set(note.id)"
                 >
@@ -265,7 +265,7 @@
             <app-tag-editor category="Note" [selected]="note.tags" (selectedChange)="onTagsChange($event)" />
           </div>
 
-          <section class="mt-2 rounded border border-slate-800 bg-slate-950/50 p-2">
+          <section class="mt-2 rounded border border-slate-700 bg-slate-950 p-2">
             <div class="mb-1.5 flex items-center justify-between">
               <h3 class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Attachments</h3>
               <label class="cursor-pointer text-[10px] text-sky-400 transition hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">

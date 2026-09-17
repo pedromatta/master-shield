@@ -2,6 +2,30 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.14.
 
+## Theming
+
+The look and feel is defined in one place: **`src/styles.css`**.
+
+- **Colours** are Tailwind v4 design tokens. The standard utility scales
+  (`slate`, `sky`, `amber`, `emerald`, `rose`, `violet`) are *remapped* to the
+  earthy tabletop palette inside the `@theme` block. Components keep using the
+  normal utility names (`bg-slate-900`, `text-sky-300`, …), so re-skinning the
+  whole app means editing those token values only.
+- **Surfaces** are named layers so structure is decoupled from the raw palette:
+  `bg-surface-base` (app backdrop), `bg-surface-panel` (windows, boards, side
+  rails), `bg-surface-inset` (wells set into a panel) and `bg-surface-raised`
+  (controls, rows, headers). They are deliberately opaque — solid carved boards
+  rather than translucent "glass" panels.
+- **Fonts** are self-hosted via `@fontsource` and exposed as `--font-display`
+  (Cinzel, headings and window chrome), `--font-serif` (EB Garamond, body) and
+  `--font-sans` (Inter, dense data).
+- A few places need a concrete colour in TypeScript (new resource bars, tag
+  defaults, low-health colour). Those live in
+  **`src/app/core/theme/theme.ts`** and mirror the CSS tokens.
+
+To change the theme, update the token values in `src/styles.css` (and the
+matching literals in `theme.ts`).
+
 ## Development server
 
 To start a local development server, run:

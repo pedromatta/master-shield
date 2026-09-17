@@ -1,12 +1,12 @@
 <aside
-  class="flex min-h-0 flex-col border-r border-slate-800 bg-slate-900/40 transition-[width] duration-150"
+  class="flex min-h-0 flex-col border-r-2 border-slate-700 bg-surface-panel transition-[width] duration-150"
   [class]="collapsed() ? 'w-10' : 'w-52'"
   aria-label="Player characters"
 >
-  <header class="flex shrink-0 items-center gap-1 border-b border-slate-800 px-1.5 py-1.5">
+  <header class="flex shrink-0 items-center gap-1 border-b border-slate-700 px-1.5 py-1.5">
     <button
       type="button"
-      class="grid size-6 shrink-0 place-items-center rounded text-slate-400 transition hover:bg-slate-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="grid size-6 shrink-0 place-items-center rounded text-slate-400 transition hover:bg-surface-raised hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       [attr.aria-label]="collapsed() ? 'Expand character rail' : 'Collapse character rail'"
       [attr.aria-expanded]="!collapsed()"
       (click)="collapsed.set(!collapsed())"
@@ -20,7 +20,7 @@
       </h2>
       <button
         type="button"
-        class="shrink-0 rounded px-1 text-[10px] text-sky-400 transition hover:bg-slate-800 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        class="shrink-0 rounded px-1 text-[10px] text-sky-400 transition hover:bg-surface-raised hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
         [attr.aria-expanded]="showCreate()"
         (click)="showCreate.set(!showCreate())"
       >
@@ -42,7 +42,7 @@
     }
 
     @if (showCreate()) {
-      <div class="shrink-0 space-y-1 border-b border-slate-800 bg-slate-950/40 p-2">
+      <div class="shrink-0 space-y-1 border-b border-slate-700 bg-slate-950 p-2">
         <label for="pc-name" class="sr-only">Character name</label>
         <input
           id="pc-name"
@@ -77,7 +77,7 @@
         </p>
       } @else {
         @for (character of characters(); track trackCharacter($index, character)) {
-          <article class="group/pc rounded-lg border border-slate-800 bg-slate-950/50 p-1.5 transition hover:border-sky-700">
+          <article class="group/pc rounded-lg border border-slate-700 bg-slate-950 p-1.5 transition hover:border-sky-700">
             <div class="flex items-start gap-1.5">
               <app-image-upload
                 [compact]="true"
@@ -153,7 +153,7 @@
               loading="lazy"
             />
           } @else {
-            <span class="grid size-7 place-items-center rounded border border-slate-700 bg-slate-900 text-slate-400" aria-hidden="true">
+            <span class="grid size-7 place-items-center rounded border border-slate-700 bg-surface-panel text-slate-400" aria-hidden="true">
               <app-icon [name]="character.iconId ?? ''" [size]="16" />
             </span>
           }

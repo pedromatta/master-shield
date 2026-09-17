@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { FormsModule } from '@angular/forms';
 
 import { Resource, resourcePercent } from '../../core/models/actor.model';
+import { LOW_RESOURCE_COLOR } from '../../core/theme/theme';
 
 export interface ResourceChange {
   readonly resourceId: string;
@@ -34,6 +35,9 @@ export class ResourceBarComponent {
   readonly adjusted = output<ResourceChange>();
 
   protected readonly expression = signal('');
+
+  /** Colour shown when the bar falls into its low state (theme-controlled). */
+  protected readonly lowColor = LOW_RESOURCE_COLOR;
 
   protected readonly percent = computed(() => resourcePercent(this.resource()));
 

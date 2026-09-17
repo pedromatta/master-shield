@@ -1,5 +1,5 @@
 <div class="flex h-full min-h-0 flex-col">
-  <div class="shrink-0 space-y-2 border-b border-slate-800 p-2">
+  <div class="shrink-0 space-y-2 border-b border-slate-700 p-2">
     <div class="flex items-center gap-1.5">
       <label class="sr-only" for="location-search">Search locations</label>
       <input
@@ -30,7 +30,7 @@
     </div>
 
     @if (showCreate()) {
-      <div class="flex items-end gap-1.5 rounded border border-slate-800 bg-slate-950/60 p-2">
+      <div class="flex items-end gap-1.5 rounded border border-slate-700 bg-slate-950 p-2">
         <div class="min-w-0 flex-1">
           <label for="location-name" class="mb-0.5 block text-[10px] text-slate-500">Name</label>
           <input
@@ -69,7 +69,7 @@
             <button
               type="button"
               class="rounded-full border px-2 py-0.5 text-[10px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-              [class]="isTagActive(tag.id) ? 'bg-slate-800 font-medium' : 'border-slate-700 text-slate-500'"
+              [class]="isTagActive(tag.id) ? 'bg-surface-raised font-medium' : 'border-slate-700 text-slate-500'"
               [style]="isTagActive(tag.id) ? 'border-color:' + tag.colorHex + ';color:' + tag.colorHex : ''"
               [attr.aria-pressed]="isTagActive(tag.id)"
               (click)="toggleTag(tag.id)"
@@ -82,7 +82,7 @@
     }
 
     <!-- Stable map address -->
-    <div class="rounded border border-slate-800 bg-slate-950/60 p-1.5">
+    <div class="rounded border border-slate-700 bg-slate-950 p-1.5">
       <div class="flex items-center gap-1.5">
         <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Map address</span>
         <code class="min-w-0 flex-1 truncate rounded bg-slate-950 px-1.5 py-0.5 font-mono text-[10px] text-emerald-400">
@@ -123,8 +123,8 @@
       <ul class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-2">
         @for (location of filtered(); track trackLocation($index, location)) {
           <li
-            class="group/loc overflow-hidden rounded-lg border bg-slate-900/70 transition"
-            [class]="isCurrentMap(location) ? 'border-emerald-500' : 'border-slate-800 hover:border-sky-600'"
+            class="group/loc overflow-hidden rounded-lg border bg-surface-panel transition"
+            [class]="isCurrentMap(location) ? 'border-emerald-500' : 'border-slate-700 hover:border-sky-600'"
           >
             @if (editingId() === location.id) {
               <div class="space-y-1.5 p-2">
@@ -225,14 +225,14 @@
                 </span>
               </button>
 
-              <div class="flex items-center gap-1 border-t border-slate-800 px-1.5 py-1">
+              <div class="flex items-center gap-1 border-t border-slate-700 px-1.5 py-1">
                 <button
                   type="button"
                   class="text-[10px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   [attr.aria-label]="'Edit ' + location.name"
                   (click)="startEditing(location)"
                 >
-                  <app-icon name="lu:pencil" [size]="11" /> Edit
+                  <span class="inline-flex items-center gap-1"><app-icon name="lu:pencil" [size]="11" /><span>Edit</span></span>
                 </button>
                 <button
                   type="button"

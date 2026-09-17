@@ -15,6 +15,7 @@ import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.
 import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { RulePickerComponent } from '../../../shared/rule-picker/rule-picker.component';
+import { DEFAULT_RESOURCE_COLOR } from '../../../core/theme/theme';
 
 /** Full editable character/NPC sheet, opened in a window from any actor card. */
 @Component({
@@ -54,7 +55,7 @@ export class ActorSheetComponent {
 
   protected readonly newResourceName = signal('');
   protected readonly newResourceMax = signal(10);
-  protected readonly newResourceColor = signal('#38bdf8');
+  protected readonly newResourceColor = signal(DEFAULT_RESOURCE_COLOR);
 
   protected readonly actor = computed(() => this.store.actorById(this.actorId()));
 

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ContentStoreService } from '../../core/services/content-store.service';
 import { Tag, TagCategory } from '../../core/models/actor.model';
 import { IconComponent } from '../icon/icon.component';
+import { DEFAULT_RESOURCE_COLOR } from '../../core/theme/theme';
 
 /**
  * Chip-style tag picker shared by actors, notes, locations, rules and counters. Tags are
@@ -33,7 +34,7 @@ export class TagEditorComponent {
   /** True while a create request is in flight; separate from `creating` (form visibility). */
   protected readonly saving = signal(false);
   protected readonly draftName = signal('');
-  protected readonly draftColor = signal('#38bdf8');
+  protected readonly draftColor = signal(DEFAULT_RESOURCE_COLOR);
   protected readonly error = signal<string | null>(null);
 
   /** Unique per-instance ids so multiple pickers on one page never collide. */
