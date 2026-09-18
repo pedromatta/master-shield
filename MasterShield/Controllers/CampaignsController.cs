@@ -1,4 +1,5 @@
 using MasterShield.Models;
+using MasterShield.Services.Implementations;
 using MasterShield.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -104,13 +105,16 @@ public class CampaignsController : ControllerBase
 
         var imageUri = location.ImageUri;
 
-        // Locally stored uploads are streamed straight from disk.
+        // Locally stored uploads are read from disk, then normalised to the map aspect ratio.
         var local = _storage.OpenRead(imageUri);
         if (local is { } file)
         {
-            // Encourage streaming playback and allow range requests without buffering the
-            // whole image in memory.
-            return File(file.Stream, file.ContentType, enableRangeProcessing: true);
+            await using (file.Stream)
+            {
+                using var buffer = new MemoryStream();
+                await file.Stream.CopyToAsync(buffer);
+                return MapImage(buffer.ToArray());
+            }
         }
 
         // Remote hosts (image sharing / VTT asset servers): fetch server-side and relay the
@@ -139,14 +143,22 @@ public class CampaignsController : ControllerBase
             // Buffer the relayed image so the upstream connection can be released promptly.
             var buffer = new MemoryStream();
             await upstream.CopyToAsync(buffer);
-            buffer.Position = 0;
 
-            var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
-            return File(buffer, contentType, enableRangeProcessing: true);
+            return MapImage(buffer.ToArray());
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             return StatusCode(StatusCodes.Status502BadGateway, "The remote map image could not be retrieved.");
         }
+    }
+
+    /// <summary>
+    /// Serves map bytes on a 22:13 canvas, letterboxing with black when the source does not
+    /// match that ratio so a virtual tabletop never stretches the image.
+    /// </summary>
+    private FileContentResult MapImage(byte[] bytes)
+    {
+        var fitted = MapImageNormalizer.FitToMapRatio(bytes, out var contentType, out _);
+        return File(fitted, contentType);
     }
 }
