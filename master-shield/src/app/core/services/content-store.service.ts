@@ -427,14 +427,22 @@ export class ContentStoreService {
     this._notes.update((notes) => notes.map((note) => (note.id === noteId ? { ...note, tags } : note)));
   }
 
-  async createNoteCategory(name: string, icon: string): Promise<NoteCategory> {
+  async createNoteCategory(name: string, icon: string, iconId = ''): Promise<NoteCategory> {
     const created = await this.content.createNoteCategory({
       campaignId: this.requireCampaign(),
       name: name.trim(),
       icon,
+      iconId,
     });
     this._noteCategories.update((categories) => [...categories, created]);
     return created;
+  }
+
+  async updateNoteCategory(category: NoteCategory): Promise<void> {
+    await this.content.updateNoteCategory(category);
+    this._noteCategories.update((categories) =>
+      categories.map((c) => (c.id === category.id ? category : c)),
+    );
   }
 
   /** Uploads a note-category icon and stores the returned URI on the category. */
