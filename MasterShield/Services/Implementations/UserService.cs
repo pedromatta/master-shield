@@ -34,6 +34,71 @@ public class UserService : IUserService
     public async Task<User?> GetByUsernameAsync(string username) =>
         await _userManager.FindByNameAsync(username);
 
+    public async Task<User?> AuthenticateAsync(string username, string password)
+    {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            return null;
+
+        var user = await _userManager.FindByNameAsync(username.Trim());
+        if (user is null)
+            return null;
+
+        return await _userManager.CheckPasswordAsync(user, password) ? user : null;
+    }
+
+    /// <summary>Public sign-up: creates an account with the same validation as admin creation.</summary>
+    public Task<UserResult> SignUpAsync(
+        string username, string? email, string password, string? displayName) =>
+        CreateAsync(username, email, password, displayName);
+
+    public async Task<string?> CreatePasswordResetTokenAsync(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return null;
+
+        var user = await _userManager.FindByNameAsync(username.Trim());
+        if (user is null)
+            return null;
+
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
+    }
+
+    public async Task<UserResult> ResetPasswordAsync(string username, string token, string newPassword)
+    {
+        if (string.IsNullOrWhiteSpace(newPassword))
+            return UserResult.Invalid("The new password is required.");
+
+        var user = await _userManager.FindByNameAsync(username?.Trim() ?? string.Empty);
+        if (user is null)
+            return UserResult.Invalid("That reset request is not valid.");
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        return result.Succeeded
+            ? UserResult.Ok(user)
+            : UserResult.Invalid(string.Join(" ", result.Errors.Select(e => e.Description)));
+    }
+
+    public async Task<User?> UpdateThemeAsync(Guid id, ThemePatch theme)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+            return null;
+
+        // Null fields are "no change"; empty strings clear the override.
+        if (theme.Accent is not null) user.ThemeAccent = Nullify(theme.Accent);
+        if (theme.Danger is not null) user.ThemeDanger = Nullify(theme.Danger);
+        if (theme.Success is not null) user.ThemeSuccess = Nullify(theme.Success);
+        if (theme.FontBody is not null) user.ThemeFontBody = Nullify(theme.FontBody);
+        if (theme.FontDisplay is not null) user.ThemeFontDisplay = Nullify(theme.FontDisplay);
+        if (theme.BackgroundUri is not null) user.ThemeBackgroundUri = Nullify(theme.BackgroundUri);
+
+        var result = await _userManager.UpdateAsync(user);
+        return result.Succeeded ? user : null;
+    }
+
+    private static string? Nullify(string value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
     public async Task<UserResult> CreateAsync(
         string username, string? email, string password, string? displayName)
     {

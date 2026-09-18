@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using MasterShield.Data;
 using MasterShield.Models;
@@ -12,8 +13,8 @@ var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
 builder.Services.AddDbContext<MasterShieldContext>(options => options.UseNpgsql(connectionString));
 
 // Accounts are managed by ASP.NET Core Identity so passwords are hashed with the
-// framework KDF and the credential store is standard. No auth pipeline is wired yet:
-// this is a local table tool, so identity is used for account management only.
+// framework KDF and the credential store is standard. A cookie authentication scheme backs
+// the sign-in flow used by the SPA on the same origin.
 builder.Services
     .AddIdentityCore<User>(options =>
     {
@@ -26,6 +27,30 @@ builder.Services
     })
     .AddEntityFrameworkStores<MasterShieldContext>()
     .AddDefaultTokenProviders();
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "master_shield_auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        // The API is called by fetch/XHR; answer with status codes instead of redirects.
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddDataProtection();
 
