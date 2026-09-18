@@ -97,11 +97,27 @@ public class UserService : IUserService
 
         // Null fields are "no change"; empty strings clear the override.
         if (theme.Accent is not null) user.ThemeAccent = Nullify(theme.Accent);
+        if (theme.Secondary is not null) user.ThemeSecondary = Nullify(theme.Secondary);
         if (theme.Danger is not null) user.ThemeDanger = Nullify(theme.Danger);
         if (theme.Success is not null) user.ThemeSuccess = Nullify(theme.Success);
+        if (theme.SurfaceBase is not null) user.ThemeSurfaceBase = Nullify(theme.SurfaceBase);
+        if (theme.SurfacePanel is not null) user.ThemeSurfacePanel = Nullify(theme.SurfacePanel);
+        if (theme.SurfaceRaised is not null) user.ThemeSurfaceRaised = Nullify(theme.SurfaceRaised);
+        if (theme.SurfaceInset is not null) user.ThemeSurfaceInset = Nullify(theme.SurfaceInset);
+        if (theme.TextMain is not null) user.ThemeTextMain = Nullify(theme.TextMain);
+        if (theme.TextMuted is not null) user.ThemeTextMuted = Nullify(theme.TextMuted);
+        if (theme.BorderColor is not null) user.ThemeBorderColor = Nullify(theme.BorderColor);
         if (theme.FontBody is not null) user.ThemeFontBody = Nullify(theme.FontBody);
         if (theme.FontDisplay is not null) user.ThemeFontDisplay = Nullify(theme.FontDisplay);
         if (theme.BackgroundUri is not null) user.ThemeBackgroundUri = Nullify(theme.BackgroundUri);
+        if (theme.BackgroundOpacity is not null) user.ThemeBackgroundOpacity = Nullify(theme.BackgroundOpacity);
+        if (theme.BackgroundBlur is not null) user.ThemeBackgroundBlur = Nullify(theme.BackgroundBlur);
+        if (theme.BackgroundFit is not null) user.ThemeBackgroundFit = Nullify(theme.BackgroundFit);
+        if (theme.BackgroundPosition is not null) user.ThemeBackgroundPosition = Nullify(theme.BackgroundPosition);
+        if (theme.BackgroundRepeat is not null) user.ThemeBackgroundRepeat = Nullify(theme.BackgroundRepeat);
+        if (theme.BackgroundAttachment is not null) user.ThemeBackgroundAttachment = Nullify(theme.BackgroundAttachment);
+        if (theme.WindowOpacity is not null) user.ThemeWindowOpacity = Nullify(theme.WindowOpacity);
+        if (theme.ChromeOpacity is not null) user.ThemeChromeOpacity = Nullify(theme.ChromeOpacity);
 
         var result = await _userManager.UpdateAsync(user);
         return result.Succeeded ? user : null;

@@ -19,11 +19,27 @@ public record UserResult(UserResultStatus Status, User? User, string? Error = nu
 /// </summary>
 public record ThemePatch(
     string? Accent = null,
+    string? Secondary = null,
     string? Danger = null,
     string? Success = null,
+    string? SurfaceBase = null,
+    string? SurfacePanel = null,
+    string? SurfaceRaised = null,
+    string? SurfaceInset = null,
+    string? TextMain = null,
+    string? TextMuted = null,
+    string? BorderColor = null,
     string? FontBody = null,
     string? FontDisplay = null,
-    string? BackgroundUri = null);
+    string? BackgroundUri = null,
+    string? BackgroundOpacity = null,
+    string? BackgroundBlur = null,
+    string? BackgroundFit = null,
+    string? BackgroundPosition = null,
+    string? BackgroundRepeat = null,
+    string? BackgroundAttachment = null,
+    string? WindowOpacity = null,
+    string? ChromeOpacity = null);
 
 public interface IUserService
 {

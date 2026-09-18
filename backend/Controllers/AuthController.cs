@@ -166,8 +166,13 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var updated = await _users.UpdateThemeAsync(userId, new ThemePatch(
-            request.Accent, request.Danger, request.Success,
-            request.FontBody, request.FontDisplay, request.BackgroundUri));
+            request.Accent, request.Secondary, request.Danger, request.Success,
+            request.SurfaceBase, request.SurfacePanel, request.SurfaceRaised, request.SurfaceInset,
+            request.TextMain, request.TextMuted, request.BorderColor,
+            request.FontBody, request.FontDisplay, request.BackgroundUri,
+            request.BackgroundOpacity, request.BackgroundBlur, request.BackgroundFit,
+            request.BackgroundPosition, request.BackgroundRepeat, request.BackgroundAttachment,
+            request.WindowOpacity, request.ChromeOpacity));
         return updated is null ? NotFound() : Ok(AuthUser.From(updated));
     }
 
@@ -216,32 +221,80 @@ public class AuthController : ControllerBase
     /// <summary>Theme overrides; a null field leaves the current value untouched.</summary>
     public record ThemeRequest(
         string? Accent = null,
+        string? Secondary = null,
         string? Danger = null,
         string? Success = null,
+        string? SurfaceBase = null,
+        string? SurfacePanel = null,
+        string? SurfaceRaised = null,
+        string? SurfaceInset = null,
+        string? TextMain = null,
+        string? TextMuted = null,
+        string? BorderColor = null,
         string? FontBody = null,
         string? FontDisplay = null,
-        string? BackgroundUri = null);
+        string? BackgroundUri = null,
+        string? BackgroundOpacity = null,
+        string? BackgroundBlur = null,
+        string? BackgroundFit = null,
+        string? BackgroundPosition = null,
+        string? BackgroundRepeat = null,
+        string? BackgroundAttachment = null,
+        string? WindowOpacity = null,
+        string? ChromeOpacity = null);
 
     public record AuthUser(
         string Id,
         string Username,
         string DisplayName,
         string? ThemeAccent,
+        string? ThemeSecondary,
         string? ThemeDanger,
         string? ThemeSuccess,
+        string? ThemeSurfaceBase,
+        string? ThemeSurfacePanel,
+        string? ThemeSurfaceRaised,
+        string? ThemeSurfaceInset,
+        string? ThemeTextMain,
+        string? ThemeTextMuted,
+        string? ThemeBorderColor,
         string? ThemeFontBody,
         string? ThemeFontDisplay,
-        string? ThemeBackgroundUri)
+        string? ThemeBackgroundUri,
+        string? ThemeBackgroundOpacity,
+        string? ThemeBackgroundBlur,
+        string? ThemeBackgroundFit,
+        string? ThemeBackgroundPosition,
+        string? ThemeBackgroundRepeat,
+        string? ThemeBackgroundAttachment,
+        string? ThemeWindowOpacity,
+        string? ThemeChromeOpacity)
     {
         public static AuthUser From(User user) => new(
             user.Id.ToString(),
             user.UserName ?? string.Empty,
             user.DisplayName ?? string.Empty,
             user.ThemeAccent,
+            user.ThemeSecondary,
             user.ThemeDanger,
             user.ThemeSuccess,
+            user.ThemeSurfaceBase,
+            user.ThemeSurfacePanel,
+            user.ThemeSurfaceRaised,
+            user.ThemeSurfaceInset,
+            user.ThemeTextMain,
+            user.ThemeTextMuted,
+            user.ThemeBorderColor,
             user.ThemeFontBody,
             user.ThemeFontDisplay,
-            user.ThemeBackgroundUri);
+            user.ThemeBackgroundUri,
+            user.ThemeBackgroundOpacity,
+            user.ThemeBackgroundBlur,
+            user.ThemeBackgroundFit,
+            user.ThemeBackgroundPosition,
+            user.ThemeBackgroundRepeat,
+            user.ThemeBackgroundAttachment,
+            user.ThemeWindowOpacity,
+            user.ThemeChromeOpacity);
     }
 }
