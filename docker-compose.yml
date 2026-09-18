@@ -28,6 +28,15 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       # Allow the browser origin served by the web container.
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8090}
+      # Public URL used to build password-reset links.
+      App__PublicUrl: ${APP_PUBLIC_URL:-http://localhost:8090}
+      # SMTP settings for password-reset email.
+      Email__Host: ${EMAIL_HOST:-}
+      Email__Port: ${EMAIL_PORT:-587}
+      Email__User: ${EMAIL_USER:-}
+      Email__Password: ${EMAIL_PASSWORD:-}
+      Email__From: ${EMAIL_FROM:-}
+      Email__EnableSsl: ${EMAIL_ENABLE_SSL:-true}
     volumes:
       - api-db:/var/lib/postgresql
       - api-uploads:/app/wwwroot/uploads

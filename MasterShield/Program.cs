@@ -5,6 +5,7 @@ using MasterShield.Data;
 using MasterShield.Models;
 using MasterShield.Services.Implementations;
 using MasterShield.Services.Interfaces;
+using MasterShield.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,9 @@ builder.Services.AddDataProtection();
 builder.Services.AddControllers(options =>
 {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    // Every campaign-scoped route is ownership-checked by default; the public map endpoints
+    // opt out explicitly.
+    options.Filters.Add<CampaignOwnershipFilter>();
 })
 .AddJsonOptions(options =>
 {
@@ -89,6 +93,13 @@ builder.Services.AddScoped<ICounterService, CounterService>();
 builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ISystemEntityService, SystemEntityService>();
+
+// Password-reset links are delivered by email; settings come from the Email section
+// (environment variables in containers).
+var emailOptions = new EmailOptions();
+builder.Configuration.GetSection("Email").Bind(emailOptions);
+builder.Services.AddSingleton(emailOptions);
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // Browser origins allowed to call the API. Defaults cover the Angular dev server; the
 // CORS_ORIGINS environment variable overrides them for container deployments.
