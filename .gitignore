@@ -41,9 +41,22 @@ bld/
 #wwwroot/
 
 # User-uploaded media is stored under wwwroot at runtime and must not be committed.
-Daedala/wwwroot/uploads/
+**/wwwroot/uploads/actors/**/*
+**/wwwroot/uploads/backgrounds/**/*
+**/wwwroot/uploads/locations/**/*
+**/wwwroot/uploads/note-categories/**/*
+**/wwwroot/uploads/notes/**/*
+**/wwwroot/uploads/rule-categories/**/*
+**/wwwroot/uploads/rules/**/*
 
-# AI assistant metadata and scratch files are never committed.
+!**/wwwroot/uploads/actors/.gitkeep
+!**/wwwroot/uploads/backgrounds/.gitkeep
+!**/wwwroot/uploads/locations/.gitkeep
+!**/wwwroot/uploads/note-categories/.gitkeep
+!**/wwwroot/uploads/notes/.gitkeep
+!**/wwwroot/uploads/rule-categories/.gitkeep
+!**/wwwroot/uploads/rules/.gitkeep
+
 AGENTS.md
 CLAUDE.md
 .cursorrules
