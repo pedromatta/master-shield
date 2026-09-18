@@ -10,11 +10,12 @@ import { assetUrl } from '../../../core/services/asset-url';
 import { TagEditorComponent } from '../../../shared/tag-editor/tag-editor.component';
 import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
+import { MarkdownEditorComponent } from '../../../shared/markdown-editor/markdown-editor.component';
 
 /** Notes panel: category sidebar on the left, note editor on the right. */
 @Component({
   selector: 'app-notes-panel',
-  imports: [FormsModule, TagEditorComponent, ImageUploadComponent, NgTemplateOutlet, IconComponent],
+  imports: [FormsModule, TagEditorComponent, ImageUploadComponent, NgTemplateOutlet, IconComponent, MarkdownEditorComponent],
   templateUrl: './notes-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

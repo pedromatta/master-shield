@@ -8,7 +8,7 @@
       id="note-search"
       type="search"
       placeholder="Search…"
-      class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none sm:max-w-[12rem]"
+      class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[13px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none sm:max-w-[12rem]"
       [value]="search()"
       (input)="search.set($any($event.target).value)"
     />
@@ -19,7 +19,7 @@
           <li>
             <button
               type="button"
-              class="rounded-full border px-1.5 py-0.5 text-[9px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              class="rounded-full border px-1.5 py-0.5 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               [class]="isTagActive(tag.id) ? 'bg-surface-raised font-medium' : 'border-slate-700 text-slate-500'"
               [style]="isTagActive(tag.id) ? 'border-color:' + tag.colorHex + ';color:' + tag.colorHex : ''"
               [attr.aria-pressed]="isTagActive(tag.id)"
@@ -34,7 +34,7 @@
 
     <button
       type="button"
-      class="rounded border border-slate-700 px-2 py-0.5 text-[11px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="rounded border border-slate-700 px-2 py-0.5 text-[13px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       [attr.aria-expanded]="showCategoryForm()"
       (click)="showCategoryForm.set(!showCategoryForm())"
     >
@@ -42,7 +42,7 @@
     </button>
     <button
       type="button"
-      class="rounded bg-sky-600 px-2 py-0.5 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+      class="rounded bg-sky-600 px-2 py-0.5 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
       (click)="createNote()"
     >
       + Note
@@ -50,7 +50,7 @@
   </div>
 
   @if (error()) {
-    <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+    <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[13px] text-rose-300" role="alert">
       {{ error() }}
     </p>
   }
@@ -68,14 +68,14 @@
         id="category-name"
         type="text"
         placeholder="Category name"
-        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
         [value]="newCategoryName()"
         (input)="newCategoryName.set($any($event.target).value)"
         (keydown.enter)="createCategory()"
       />
       <button
         type="button"
-        class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+        class="rounded bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
         [disabled]="!newCategoryName().trim()"
         (click)="createCategory()"
       >
@@ -95,10 +95,10 @@
           [attr.aria-expanded]="isCategorySelected(null)"
           (click)="selectCategory(null)"
         >
-          <span class="shrink-0 text-[10px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(null)" aria-hidden="true">▶</span>
+          <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(null)" aria-hidden="true">▶</span>
           <app-icon name="lu:folder" [size]="13" />
           <span class="min-w-0 flex-1 truncate text-xs font-medium" [class]="isCategorySelected(null) ? 'text-sky-300' : 'text-slate-200'">All notes</span>
-          <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory(null) }}</span>
+          <span class="shrink-0 rounded bg-surface-raised px-1 text-[11px] text-slate-400">{{ countForCategory(null) }}</span>
         </button>
         @if (isCategorySelected(null)) {
           <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
@@ -116,14 +116,14 @@
               [attr.aria-expanded]="isCategorySelected(category.id)"
               (click)="selectCategory(category.id)"
             >
-              <span class="shrink-0 text-[10px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(category.id)" aria-hidden="true">▶</span>
+              <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(category.id)" aria-hidden="true">▶</span>
               @if (category.iconUri) {
                 <img [src]="iconUrl(category.iconUri)" [alt]="''" class="size-4 shrink-0 rounded-sm object-cover" loading="lazy" />
               } @else {
                 <app-icon name="lu:notebook" [size]="13" />
               }
               <span class="min-w-0 flex-1 truncate text-xs font-medium" [class]="isCategorySelected(category.id) ? 'text-sky-300' : 'text-slate-200'">{{ category.name }}</span>
-              <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory(category.id) }}</span>
+              <span class="shrink-0 rounded bg-surface-raised px-1 text-[11px] text-slate-400">{{ countForCategory(category.id) }}</span>
             </button>
             <app-image-upload
               [compact]="true"
@@ -134,7 +134,7 @@
             />
             <button
               type="button"
-              class="shrink-0 rounded px-1 text-[10px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/cat:opacity-100"
+              class="shrink-0 rounded px-1 text-[12px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/cat:opacity-100"
               [attr.aria-label]="'Delete category ' + category.name"
               (click)="deleteCategory(category, $event)"
             >
@@ -157,10 +157,10 @@
           [attr.aria-expanded]="isCategorySelected('uncategorised')"
           (click)="selectCategory('uncategorised')"
         >
-          <span class="shrink-0 text-[10px] text-slate-500 transition" [class.rotate-90]="isCategorySelected('uncategorised')" aria-hidden="true">▶</span>
+          <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected('uncategorised')" aria-hidden="true">▶</span>
           <app-icon name="lu:file-text" [size]="13" />
           <span class="min-w-0 flex-1 truncate text-xs font-medium italic" [class]="isCategorySelected('uncategorised') ? 'text-sky-300' : 'text-slate-400'">Uncategorised</span>
-          <span class="shrink-0 rounded bg-surface-raised px-1 text-[9px] text-slate-400">{{ countForCategory('uncategorised') }}</span>
+          <span class="shrink-0 rounded bg-surface-raised px-1 text-[11px] text-slate-400">{{ countForCategory('uncategorised') }}</span>
         </button>
         @if (isCategorySelected('uncategorised')) {
           <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
@@ -176,14 +176,14 @@
     <div class="grid min-h-0 grid-cols-[9rem_minmax(0,1fr)] gap-2">
       <nav class="max-h-64 overflow-y-auto" aria-label="Notes">
         @if (visibleNotes().length === 0) {
-          <p class="px-1 py-1 text-[10px] italic text-slate-600">No notes here yet.</p>
+          <p class="px-1 py-1 text-[12px] italic text-slate-600">No notes here yet.</p>
         } @else {
           <ul class="space-y-0.5">
             @for (note of visibleNotes(); track trackNote($index, note)) {
               <li>
                 <button
                   type="button"
-                  class="w-full truncate rounded px-1.5 py-1 text-left text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  class="w-full truncate rounded px-1.5 py-1 text-left text-[13px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   [class]="note.id === selectedNoteId() ? 'bg-surface-raised text-sky-300' : 'text-slate-400 hover:bg-surface-panel'"
                   [attr.aria-current]="note.id === selectedNoteId() ? 'true' : null"
                   (click)="selectedNoteId.set(note.id)"
@@ -209,7 +209,7 @@
             />
             <button
               type="button"
-              class="grid size-6 shrink-0 place-items-center rounded border border-slate-700 text-[11px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+              class="grid size-6 shrink-0 place-items-center rounded border border-slate-700 text-[13px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
               [disabled]="!canGoPrevious()"
               aria-label="Previous note"
               (click)="goToPrevious()"
@@ -218,7 +218,7 @@
             </button>
             <button
               type="button"
-              class="grid size-6 shrink-0 place-items-center rounded border border-slate-700 text-[11px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+              class="grid size-6 shrink-0 place-items-center rounded border border-slate-700 text-[13px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
               [disabled]="!canGoNext()"
               aria-label="Next note"
               (click)="goToNext()"
@@ -227,7 +227,7 @@
             </button>
             <button
               type="button"
-              class="shrink-0 rounded border border-slate-700 px-1.5 py-1 text-[10px] text-rose-400 transition hover:border-rose-700 hover:bg-rose-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              class="shrink-0 rounded border border-slate-700 px-1.5 py-1 text-[12px] text-rose-400 transition hover:border-rose-700 hover:bg-rose-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               (click)="deleteNote()"
             >
               Delete
@@ -235,10 +235,10 @@
           </div>
 
           <div class="mb-1.5 flex items-center gap-1.5">
-            <label for="note-category" class="text-[10px] uppercase tracking-wider text-slate-500">Category</label>
+            <label for="note-category" class="text-[12px] uppercase tracking-wider text-slate-500">Category</label>
             <select
               id="note-category"
-              class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
               [value]="note.noteCategoryId ?? ''"
               (change)="changeNoteCategory($any($event.target).value)"
             >
@@ -248,18 +248,16 @@
               }
             </select>
             @if (saving()) {
-              <span class="text-[10px] text-sky-400">saving…</span>
+              <span class="text-[12px] text-sky-400">saving…</span>
             }
           </div>
 
-          <label for="note-content" class="sr-only">Note content</label>
-          <textarea
-            id="note-content"
-            class="min-h-[6rem] flex-1 resize-y rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs leading-relaxed text-slate-200 focus:border-sky-500 focus:outline-none"
-            placeholder="Write the note…"
+          <app-markdown-editor
+            label="Note content"
+            placeholder="Write the note… Markdown supported."
             [value]="note.content"
-            (change)="saveNoteField('content', $any($event.target).value)"
-          ></textarea>
+            (valueChange)="saveNoteField('content', $event)"
+          />
 
           <div class="mt-2">
             <app-tag-editor category="Note" [selected]="note.tags" (selectedChange)="onTagsChange($event)" />
@@ -267,8 +265,8 @@
 
           <section class="mt-2 rounded border border-slate-700 bg-slate-950 p-2">
             <div class="mb-1.5 flex items-center justify-between">
-              <h3 class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Attachments</h3>
-              <label class="cursor-pointer text-[10px] text-sky-400 transition hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
+              <h3 class="text-[12px] font-semibold uppercase tracking-wider text-slate-500">Attachments</h3>
+              <label class="cursor-pointer text-[12px] text-sky-400 transition hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
                 + Upload
                 <input
                   type="file"
@@ -280,7 +278,7 @@
             @if (note.attachments.length > 0) {
               <ul class="space-y-1">
                 @for (attachment of note.attachments; track attachment.id) {
-                  <li class="group/att flex items-center gap-2 text-[11px]">
+                  <li class="group/att flex items-center gap-2 text-[13px]">
                     <a
                       class="min-w-0 flex-1 truncate text-sky-300 transition hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                       [href]="attachmentUrl(attachment.fileUri)"
@@ -291,7 +289,7 @@
                     </a>
                     <button
                       type="button"
-                      class="shrink-0 rounded px-1 text-[10px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/att:opacity-100"
+                      class="shrink-0 rounded px-1 text-[12px] text-slate-600 opacity-0 transition hover:text-rose-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/att:opacity-100"
                       [attr.aria-label]="'Remove attachment ' + attachment.fileName"
                       (click)="removeAttachment(attachment)"
                     >
@@ -301,12 +299,12 @@
                 }
               </ul>
             } @else {
-              <p class="text-[10px] italic text-slate-600">No attachments.</p>
+              <p class="text-[12px] italic text-slate-600">No attachments.</p>
             }
           </section>
         </div>
       } @else {
-        <p class="text-[11px] italic text-slate-500">Select or create a note.</p>
+        <p class="text-[13px] italic text-slate-500">Select or create a note.</p>
       }
     </div>
   </ng-template>

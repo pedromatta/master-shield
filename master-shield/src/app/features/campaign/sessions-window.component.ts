@@ -5,6 +5,7 @@ import { ActiveGameStateService } from '../../core/services/active-game-state.se
 import { EncounterService } from '../../core/services/encounter.service';
 import { Encounter } from '../../core/models/encounter.model';
 import { Session } from '../../core/models/session.model';
+import { MarkdownEditorComponent } from '../../shared/markdown-editor/markdown-editor.component';
 
 /**
  * Sessions window: one place to create, select, rename, schedule and delete the campaign's
@@ -13,7 +14,7 @@ import { Session } from '../../core/models/session.model';
  */
 @Component({
   selector: 'app-sessions-window',
-  imports: [FormsModule],
+  imports: [FormsModule, MarkdownEditorComponent],
   templateUrl: './sessions-window.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -98,17 +99,14 @@ export class SessionsWindowComponent {
   }
 
   protected async create(): Promise<void> {
-    const title = this.newTitle().trim();
-    if (!title) return;
-
     this.busy.set(true);
     this.error.set(null);
     try {
-      const created = await this.gameState.createSession(title);
+      // No title is required: the session is numbered and named "Session #N".
+      await this.gameState.createSession(this.newTitle().trim() || undefined);
       this.newTitle.set('');
       this.showCreate.set(false);
       await this.refreshEncounters();
-      void created;
     } catch {
       this.error.set('Could not create the session.');
     } finally {
