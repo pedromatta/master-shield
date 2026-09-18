@@ -99,6 +99,20 @@ public class ActorsController : ControllerBase
         return Ok(new { imageUri = uri });
     }
 
+    /// <summary>Clears the actor's uploaded portrait so its icon is shown instead.</summary>
+    [HttpDelete("{id:guid}/image")]
+    public async Task<IActionResult> ClearImage(Guid id)
+    {
+        var actor = await _actorService.GetByIdAsync(id);
+        if (actor is null)
+            return NotFound();
+
+        _storage.Delete(actor.ImageUri);
+        actor.ImageUri = string.Empty;
+        await _actorService.UpdateAsync(actor);
+        return NoContent();
+    }
+
     [HttpPost("{actorId:guid}/resources")]
     public async Task<ActionResult<Resource>> AddResource(Guid actorId, [FromBody] Resource resource)
     {
