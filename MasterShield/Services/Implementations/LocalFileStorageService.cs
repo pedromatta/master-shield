@@ -142,5 +142,6 @@ public class LocalFileStorageService : IFileStorageService
     }
 
     private static bool IsImageScope(string scope) =>
-        scope is "actors" or "locations" or "rule-categories" or "note-categories" or "system-entities";
+        scope is "actors" or "locations" or "rule-categories" or "note-categories" or "system-entities"
+            or "backgrounds";
 }

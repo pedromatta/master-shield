@@ -11,7 +11,7 @@ public interface IFileStorageService
     static readonly string[] AllowedScopes =
     [
         "actors", "locations", "rules", "notes", "rule-categories", "note-categories",
-        "system-entities"
+        "system-entities", "backgrounds"
     ];
 
     /// <summary>
