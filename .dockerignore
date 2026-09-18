@@ -6,12 +6,12 @@
 **/obj/
 
 # Angular build output and dependencies
-master-shield/node_modules/
-master-shield/dist/
-master-shield/.angular/
+daedala/node_modules/
+daedala/dist/
+daedala/.angular/
 
 # Runtime uploads (served from a volume in the container)
-MasterShield/wwwroot/uploads/
+Daedala/wwwroot/uploads/
 
 # Environment secrets — never bake these into an image.
 .env

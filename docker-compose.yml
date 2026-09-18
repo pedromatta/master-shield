@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Master Shield — container stack.
+# Daedala — container stack.
 #
 # Two services on a private network:
 #   api  — the ASP.NET Core API **and** its embedded PostgreSQL, both inside one
@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: docker/api.Dockerfile
-    image: master-shield-api:latest
+    image: daedala-api:latest
     restart: unless-stopped
     # No `ports:` mapping: the API is reachable only on the internal network.
     expose:
@@ -47,7 +47,7 @@ services:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-    image: master-shield-web:latest
+    image: daedala-web:latest
     restart: unless-stopped
     depends_on:
       - api

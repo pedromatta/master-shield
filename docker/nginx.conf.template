@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# nginx config for the Master Shield frontend.
+# nginx config for the Daedala frontend.
 #
 # Serves the built Angular SPA and reverse-proxies the API so the browser sees a
 # single origin. `API_UPSTREAM` and `NGINX_PORT` are substituted at container

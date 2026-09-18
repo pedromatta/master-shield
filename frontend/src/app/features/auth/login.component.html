@@ -1,0 +1,195 @@
+<div class="grid h-dvh place-items-center bg-slate-950 p-4 text-slate-200">
+  <section
+    class="w-full max-w-sm rounded-lg border-2 border-slate-700 bg-surface-panel p-6 shadow-2xl shadow-black/50"
+    aria-label="Authentication"
+  >
+    <header class="mb-5 text-center">
+      <app-icon name="ra:castle" [size]="32" />
+      <h1 class="mt-2 font-display text-lg font-bold uppercase tracking-[0.18em] text-sky-400">
+        Daedala
+      </h1>
+      <p class="mt-1 text-[13px] text-slate-400">
+        @switch (mode()) {
+          @case ('signup') {
+            Create your account.
+          }
+          @case ('forgot') {
+            Recover your password.
+          }
+          @default {
+            Sign in to your table.
+          }
+        }
+      </p>
+    </header>
+
+    @if (error()) {
+      <p class="mb-3 rounded border border-rose-900 bg-rose-950/60 px-3 py-2 text-[13px] text-rose-300" role="alert">
+        {{ error() }}
+      </p>
+    }
+    @if (status()) {
+      <p class="mb-3 rounded border border-emerald-900 bg-emerald-950/50 px-3 py-2 text-[13px] text-emerald-300" role="status">
+        {{ status() }}
+      </p>
+    }
+
+    <!-- Sign in -->
+    @if (mode() === 'signin') {
+      <form (ngSubmit)="signIn()" class="space-y-3">
+        <div>
+          <label for="login-username" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Username
+          </label>
+          <input
+            id="login-username"
+            type="text"
+            autocomplete="username"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="username()"
+            (input)="username.set($any($event.target).value)"
+          />
+        </div>
+        <div>
+          <label for="login-password" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Password
+          </label>
+          <input
+            id="login-password"
+            type="password"
+            autocomplete="current-password"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded border border-sky-700 bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="!canSignIn()"
+        >
+          {{ busy() ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </form>
+
+      <div class="mt-4 flex items-center justify-between text-[13px]">
+        <button type="button" class="text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500" (click)="setMode('signup')">
+          Create an account
+        </button>
+        <button type="button" class="text-slate-400 transition hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500" (click)="setMode('forgot')">
+          Forgot password?
+        </button>
+      </div>
+    }
+
+    <!-- Sign up -->
+    @if (mode() === 'signup') {
+      <form (ngSubmit)="signUp()" class="space-y-3">
+        <div>
+          <label for="signup-username" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Username
+          </label>
+          <input
+            id="signup-username"
+            type="text"
+            autocomplete="username"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="username()"
+            (input)="username.set($any($event.target).value)"
+          />
+        </div>
+        <div>
+          <label for="signup-email" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Email <span class="text-slate-600">(optional)</span>
+          </label>
+          <input
+            id="signup-email"
+            type="email"
+            autocomplete="email"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+          />
+        </div>
+        <div>
+          <label for="signup-password" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Password
+          </label>
+          <input
+            id="signup-password"
+            type="password"
+            autocomplete="new-password"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+          />
+        </div>
+        <div>
+          <label for="signup-confirm" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Confirm password
+          </label>
+          <input
+            id="signup-confirm"
+            type="password"
+            autocomplete="new-password"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="confirm()"
+            (input)="confirm.set($any($event.target).value)"
+          />
+        </div>
+        @if (password().length > 0 && password() !== confirm()) {
+          <p class="text-[12px] text-rose-400">Passwords do not match.</p>
+        }
+        <button
+          type="submit"
+          class="w-full rounded border border-sky-700 bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="!canSignUp()"
+        >
+          {{ busy() ? 'Creating…' : 'Create account' }}
+        </button>
+      </form>
+
+      <div class="mt-4 text-center text-[13px]">
+        <button type="button" class="text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500" (click)="setMode('signin')">
+          Back to sign in
+        </button>
+      </div>
+    }
+
+    <!-- Forgot password -->
+    @if (mode() === 'forgot') {
+      <form (ngSubmit)="requestReset()" class="space-y-3">
+        <p class="text-[13px] text-slate-400">
+          Enter your username and we will email a reset link to the address on the account.
+        </p>
+        <div>
+          <label for="forgot-username" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
+            Username
+          </label>
+          <input
+            id="forgot-username"
+            type="text"
+            autocomplete="username"
+            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            [value]="username()"
+            (input)="username.set($any($event.target).value)"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded border border-sky-700 bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          [disabled]="!username().trim() || busy()"
+        >
+          {{ busy() ? 'Working…' : 'Send reset link' }}
+        </button>
+      </form>
+
+      <div class="mt-4 text-center text-[13px]">
+        <button type="button" class="text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500" (click)="setMode('signin')">
+          Back to sign in
+        </button>
+      </div>
+    }
+
+  </section>
+</div>

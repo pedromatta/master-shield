@@ -1,4 +1,4 @@
-# Master Shield
+# Daedala
 
 A game-agnostic RPG Game Master digital shield: campaigns, sessions, encounters,
 actors, locations, rules and notes backed by an ASP.NET Core API and an Angular
@@ -8,8 +8,8 @@ frontend.
 
 | Path            | Contents                                             |
 | --------------- | ---------------------------------------------------- |
-| `MasterShield/` | ASP.NET Core Web API (EF Core + PostgreSQL)          |
-| `master-shield/`| Angular frontend (standalone components, signals)    |
+| `Daedala/` | ASP.NET Core Web API (EF Core + PostgreSQL)          |
+| `daedala/`| Angular frontend (standalone components, signals)    |
 | `docker/`       | Container build files and entrypoints                |
 | `docker-compose.yml` | The container stack                             |
 
@@ -62,11 +62,11 @@ Run the API and the Angular dev server directly (PostgreSQL must be reachable):
 
 ```bash
 # API
-cd MasterShield
+cd Daedala
 dotnet run            # listens on http://localhost:5120
 
 # Frontend (separate terminal)
-cd master-shield
+cd daedala
 npm install
 npm start             # http://localhost:4200, proxied to the API
 ```

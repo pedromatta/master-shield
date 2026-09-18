@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Master Shield frontend.
+# Daedala frontend.
 #
 # Builds the Angular application and serves it with nginx, which also proxies
 # /api and /uploads to the API container so the browser only ever talks to one
@@ -11,16 +11,16 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Install dependencies against the lockfile for a reproducible build.
-COPY master-shield/package.json master-shield/package-lock.json ./
+COPY daedala/package.json daedala/package-lock.json ./
 RUN npm ci
 
-COPY master-shield/ ./
+COPY daedala/ ./
 RUN npm run build -- --configuration production
 
 # --- Runtime stage ---------------------------------------------------------
 FROM nginx:1.27-alpine AS runtime
 
-COPY --from=build /app/dist/master-shield/browser /usr/share/nginx/html
+COPY --from=build /app/dist/daedala/browser /usr/share/nginx/html
 COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # API_UPSTREAM is substituted into the nginx config by the base image's

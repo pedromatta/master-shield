@@ -1,6 +1,6 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
-# Starts an embedded PostgreSQL instance, then the Master Shield API.
+# Starts an embedded PostgreSQL instance, then the Daedala API.
 #
 # The database is reachable only on the container's own loopback and the
 # internal Docker network — it is never published to the host. Every credential
@@ -69,5 +69,5 @@ fi
 # into the image. The API applies EF migrations on startup.
 export ConnectionStrings__PostgreSQL="Host=127.0.0.1;Port=$PGPORT;Database=$POSTGRES_DB;Username=$POSTGRES_USER;Password=$POSTGRES_PASSWORD"
 
-echo "[entrypoint] Starting Master Shield API"
-exec dotnet MasterShield.dll
+echo "[entrypoint] Starting Daedala API"
+exec dotnet Daedala.dll

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Master Shield API + embedded PostgreSQL.
+# Daedala API + embedded PostgreSQL.
 #
 # The database runs inside this image and listens only on the loopback/internal
 # network; it is never published. The API binds the container network so the
@@ -11,11 +11,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Restore against the project file alone so the dependency layer caches.
-COPY MasterShield/MasterShield.csproj MasterShield/
-RUN dotnet restore MasterShield/MasterShield.csproj
+COPY Daedala/Daedala.csproj Daedala/
+RUN dotnet restore Daedala/Daedala.csproj
 
-COPY MasterShield/ MasterShield/
-RUN dotnet publish MasterShield/MasterShield.csproj -c Release -o /app
+COPY Daedala/ Daedala/
+RUN dotnet publish Daedala/Daedala.csproj -c Release -o /app
 
 # --- Runtime stage ---------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime

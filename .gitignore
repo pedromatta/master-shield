@@ -41,7 +41,7 @@ bld/
 #wwwroot/
 
 # User-uploaded media is stored under wwwroot at runtime and must not be committed.
-MasterShield/wwwroot/uploads/
+Daedala/wwwroot/uploads/
 
 # AI assistant metadata and scratch files are never committed.
 AGENTS.md
