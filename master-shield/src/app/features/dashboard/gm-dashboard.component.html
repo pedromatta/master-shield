@@ -39,12 +39,35 @@
 
     <button
       type="button"
+      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[13px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      (click)="openTheme()"
+    >
+      <app-icon name="lu:palette" [size]="13" />
+      <span>Theme</span>
+    </button>
+
+    <button
+      type="button"
       class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded border border-sky-700 bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
       (click)="showNewCampaign.set(true)"
     >
       <app-icon name="lu:plus" [size]="13" />
       <span>Campaign</span>
     </button>
+
+    @if (auth.user(); as user) {
+      <span class="shrink-0 text-[13px] text-slate-400" [title]="user.username">
+        {{ user.displayName }}
+      </span>
+      <button
+        type="button"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[13px] text-slate-300 transition hover:border-rose-600 hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        (click)="logout()"
+      >
+        <app-icon name="lu:log-out" [size]="13" />
+        <span>Sign out</span>
+      </button>
+    }
 
     @if (sessionError()) {
       <p class="truncate text-[12px] text-rose-400" role="alert">{{ sessionError() }}</p>

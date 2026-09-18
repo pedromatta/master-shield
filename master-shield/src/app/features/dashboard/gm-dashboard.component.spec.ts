@@ -145,15 +145,15 @@ describe('GmDashboardComponent', () => {
     expect(host.querySelector('[aria-label="Minimized windows"]')).toBeTruthy();
   });
 
-  it('offers account + campaign setup when the database is empty', async () => {
+  it('offers campaign setup when the signed-in GM has no campaigns', async () => {
     const fixture = TestBed.createComponent(GmDashboardComponent);
     fixture.detectChanges();
     await drainBootstrap(fixture, { campaigns: [], users: [] });
 
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('app-campaign-create')).toBeTruthy();
-    expect(host.textContent).toContain('Set up Master Shield');
-    expect(host.querySelector('#owner-username')).toBeTruthy();
+    // Accounts are created on the sign-in screen, so the campaign form only asks for a name.
     expect(host.querySelector('#campaign-name')).toBeTruthy();
+    expect(host.querySelector('#owner-username')).toBeFalsy();
   });
 });

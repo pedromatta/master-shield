@@ -11,6 +11,8 @@ import { FormsModule } from '@angular/forms';
 
 import { ContentStoreService } from '../../core/services/content-store.service';
 import { ActiveGameStateService } from '../../core/services/active-game-state.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
 import { WindowManagerService, WindowKind } from '../../core/windows/window-manager.service';
 import { CampaignCreateComponent } from '../campaign/campaign-create.component';
 import { CharacterSidebarComponent } from './character-sidebar.component';
@@ -35,7 +37,15 @@ import { WindowHostComponent } from './window-host.component';
 export class GmDashboardComponent {
   protected readonly gameState = inject(ActiveGameStateService);
   protected readonly store = inject(ContentStoreService);
+  protected readonly auth = inject(AuthService);
   private readonly windows = inject(WindowManagerService);
+  private readonly router = inject(Router);
+
+  /** Signs the GM out and returns to the login screen. */
+  protected async logout(): Promise<void> {
+    await this.auth.logout();
+    await this.router.navigate(['/login']);
+  }
 
   protected readonly showNewCampaign = signal(false);
   protected readonly sessionError = signal<string | null>(null);
@@ -96,6 +106,11 @@ export class GmDashboardComponent {
   /** Opens the game-system editor window, where presets are authored. */
   protected openSystems(): void {
     this.windows.open({ kind: 'systems', colSpan: 6, rowSpan: 8, singleton: true });
+  }
+
+  /** Opens the personal theme editor window. */
+  protected openTheme(): void {
+    this.windows.open({ kind: 'settings', colSpan: 4, rowSpan: 6, singleton: true });
   }
 
   /** Opens the single session-management window. */

@@ -45,10 +45,6 @@ export class CampaignCreateComponent {
       if (preset) this.gameSystemId.set(preset);
     });
   }
-  protected readonly ownerUsername = signal('');
-  protected readonly ownerEmail = signal('');
-  protected readonly ownerPassword = signal('');
-
   protected readonly newSystemName = signal('');
   protected readonly newSystemVersion = signal('');
   protected readonly showNewSystem = signal(false);
@@ -58,12 +54,9 @@ export class CampaignCreateComponent {
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  protected readonly needsAccount = computed(() => this.gameState.users().length === 0);
+  // Accounts are created on the sign-in screen; a campaign always belongs to the signed-in GM.
   protected readonly canSubmit = computed(
-    () =>
-      this.name().trim().length > 0 &&
-      (!this.needsAccount() || (this.ownerUsername().trim() && this.ownerPassword().length > 0)) &&
-      !this.saving(),
+    () => this.name().trim().length > 0 && !this.saving(),
   );
 
   protected onName(value: string): void {
@@ -77,14 +70,6 @@ export class CampaignCreateComponent {
     this.error.set(null);
 
     try {
-      if (this.needsAccount()) {
-        await this.gameState.createUser(
-          this.ownerUsername(),
-          this.ownerEmail(),
-          this.ownerPassword(),
-        );
-      }
-
       const campaign = await this.gameState.createCampaign({
         name: this.name(),
         gameSystemId: this.gameSystemId() || null,
@@ -104,14 +89,7 @@ export class CampaignCreateComponent {
 
       this.created.emit();
     } catch (error) {
-      this.error.set(
-        this.needsAccount()
-          ? 'Could not create the account and campaign. Check the details and try again.'
-          : 'Could not create the campaign. Check the API is running and try again.',
-      );
-      if (this.needsAccount()) {
-        this.ownerPassword.set('');
-      }
+      this.error.set('Could not create the campaign. Check the API is running and try again.');
       console.error(error);
     } finally {
       this.saving.set(false);
