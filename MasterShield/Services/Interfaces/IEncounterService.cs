@@ -10,6 +10,12 @@ public interface IEncounterService
     Task<bool> UpdateAsync(Encounter encounter);
     Task<bool> DeleteAsync(Guid id);
 
+    /// <summary>
+    /// Returns the session's active (or most recent) encounter, creating the first one when
+    /// the session has none. Every session can therefore rely on having an encounter.
+    /// </summary>
+    Task<Encounter> EnsureEncounterAsync(Guid sessionId);
+
     Task<EncounterParticipant> AddParticipantAsync(Guid encounterId, Guid actorId, decimal initiative, int temporaryHpOffset);
     Task<bool> UpdateParticipantStateAsync(Guid encounterId, Guid participantId, int temporaryHpOffset, Dictionary<string, object> temporaryEffects);
     Task<bool> RemoveParticipantAsync(Guid encounterId, Guid participantId);

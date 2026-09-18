@@ -32,11 +32,20 @@ public class EncountersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Encounter>> Create([FromBody] Encounter encounter)
     {
-        if (string.IsNullOrWhiteSpace(encounter.Name) || encounter.SessionId == Guid.Empty)
-            return BadRequest("Name and SessionId are required.");
+        if (encounter.SessionId == Guid.Empty)
+            return BadRequest("SessionId is required.");
 
+        // The name is optional: the service derives "Encounter #N" when it is omitted.
         var created = await _encounterService.CreateAsync(encounter);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    /// <summary>Returns the session's current encounter, creating one if it has none.</summary>
+    [HttpPost("session/{sessionId:guid}/ensure")]
+    public async Task<ActionResult<Encounter>> Ensure(Guid sessionId)
+    {
+        var encounter = await _encounterService.EnsureEncounterAsync(sessionId);
+        return Ok(encounter);
     }
 
     [HttpPut("{id:guid}")]

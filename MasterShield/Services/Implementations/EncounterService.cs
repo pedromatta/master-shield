@@ -37,9 +37,35 @@ public class EncounterService : IEncounterService
             encounter.Id = Guid.NewGuid();
 
         encounter.CurrentRound = encounter.CurrentRound < 1 ? 1 : encounter.CurrentRound;
+
+        // Encounters are never named by hand: default to "Encounter"; the indexer is shown
+        // alongside it by the UI.
+        var count = await _context.Encounters.CountAsync(e => e.SessionId == encounter.SessionId);
+        if (string.IsNullOrWhiteSpace(encounter.Name))
+            encounter.Name = "Encounter";
+
         _context.Encounters.Add(encounter);
         await _context.SaveChangesAsync();
         return encounter;
+    }
+
+    public async Task<Encounter> EnsureEncounterAsync(Guid sessionId)
+    {
+        var existing = await _context.Encounters
+            .Where(e => e.SessionId == sessionId)
+            .OrderByDescending(e => e.IsActive)
+            .ThenBy(e => e.Name)
+            .FirstOrDefaultAsync();
+
+        if (existing is not null)
+            return existing;
+
+        return await CreateAsync(new Encounter
+        {
+            SessionId = sessionId,
+            IsActive = true,
+            CurrentRound = 1
+        });
     }
 
     public async Task<bool> UpdateAsync(Encounter encounter)
