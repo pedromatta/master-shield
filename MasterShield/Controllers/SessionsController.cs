@@ -32,11 +32,20 @@ public class SessionsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Session>> Create([FromBody] Session session)
     {
-        if (string.IsNullOrWhiteSpace(session.Title) || session.CampaignId == Guid.Empty)
-            return BadRequest("Title and CampaignId are required.");
+        if (session.CampaignId == Guid.Empty)
+            return BadRequest("CampaignId is required.");
 
+        // The title is optional: the service derives "Session #N" when it is omitted.
         var created = await _sessionService.CreateAsync(session);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    /// <summary>Returns the campaign's current session, creating one if it has none.</summary>
+    [HttpPost("campaign/{campaignId:guid}/ensure")]
+    public async Task<ActionResult<Session>> Ensure(Guid campaignId)
+    {
+        var session = await _sessionService.EnsureSessionAsync(campaignId);
+        return Ok(session);
     }
 
     [HttpPut("{id:guid}")]

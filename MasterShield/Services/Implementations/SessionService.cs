@@ -32,10 +32,8 @@ public class SessionService : ISessionService
         if (session.Id == Guid.Empty)
             session.Id = Guid.NewGuid();
 
-        // The client only supplies a title; stamp the play date so sessions are sortable.
-        if (session.DatePlayed == default)
-            session.DatePlayed = DateTime.UtcNow;
-
+        // Sessions are never named by hand: the title defaults to "Session" and the number is
+        // shown alongside it by the UI.
         if (session.SessionNumber <= 0)
         {
             var highest = await _context.Sessions
@@ -46,9 +44,30 @@ public class SessionService : ISessionService
             session.SessionNumber = highest + 1;
         }
 
+        if (string.IsNullOrWhiteSpace(session.Title))
+            session.Title = "Session";
+
+        // The client only supplies a title; stamp the play date so sessions are sortable.
+        if (session.DatePlayed == default)
+            session.DatePlayed = DateTime.UtcNow;
+
         _context.Sessions.Add(session);
         await _context.SaveChangesAsync();
         return session;
+    }
+
+    public async Task<Session> EnsureSessionAsync(Guid campaignId)
+    {
+        // The most recent session is the one the GM is currently running.
+        var latest = await _context.Sessions
+            .Where(s => s.CampaignId == campaignId)
+            .OrderByDescending(s => s.SessionNumber)
+            .FirstOrDefaultAsync();
+
+        if (latest is not null)
+            return latest;
+
+        return await CreateAsync(new Session { CampaignId = campaignId });
     }
 
     public async Task<bool> UpdateAsync(Session session)
