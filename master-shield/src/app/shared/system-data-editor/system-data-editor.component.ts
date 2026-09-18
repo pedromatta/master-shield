@@ -26,7 +26,13 @@ export class SystemDataEditorComponent {
   readonly label = input('System Data');
   readonly readonlyMode = input(false, { alias: 'readonly' });
 
+  /** When true, each row gains an "Overview" checkbox that pins the field to the summary. */
+  readonly overviewEnabled = input(false);
+  /** Keys currently pinned to the overview. */
+  readonly overviewFields = input<string[]>([]);
+
   readonly systemDataChange = output<SystemData>();
+  readonly overviewFieldsChange = output<string[]>();
 
   protected readonly newKey = signal('');
   protected readonly invalidKey = signal(false);
@@ -38,6 +44,21 @@ export class SystemDataEditorComponent {
   );
 
   protected readonly isEmpty = computed(() => this.entries().length === 0);
+
+  protected readonly overviewSet = computed(() => new Set(this.overviewFields()));
+
+  protected isInOverview(key: string): boolean {
+    return this.overviewSet().has(key);
+  }
+
+  /** Pins/unpins a field to the actor overview. */
+  protected toggleOverview(key: string, checked: boolean): void {
+    const current = this.overviewFields();
+    const next = checked
+      ? [...current.filter((k) => k !== key), key]
+      : current.filter((k) => k !== key);
+    this.overviewFieldsChange.emit(next);
+  }
 
   protected trackKey(_index: number, entry: SystemDataEntry): string {
     return entry.key;
