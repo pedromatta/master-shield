@@ -122,7 +122,7 @@
                   type="button"
                   class="flex min-w-0 flex-1 items-center gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   [attr.aria-expanded]="isCategorySelected(category.id)"
-                  (click)="selectCategory(category.id)"
+                  (click)="toggleCategory(category.id)"
                 >
                   <span
                     class="shrink-0 text-[12px] text-slate-500 transition"
@@ -195,11 +195,11 @@
 
                   <div class="grid min-h-0 grid-cols-[8rem_minmax(0,1fr)] gap-2">
                     <nav class="max-h-64 overflow-y-auto" aria-label="Rules">
-                      @if (rules().length === 0) {
+                      @if (rulesFor(category).length === 0) {
                         <p class="px-1 py-1 text-[12px] italic text-slate-600">No rules yet.</p>
                       } @else {
                         <ul class="space-y-0.5">
-                          @for (rule of rules(); track trackRule($index, rule)) {
+                          @for (rule of rulesFor(category); track trackRule($index, rule)) {
                             <li>
                               <button
                                 type="button"
@@ -216,7 +216,7 @@
                       }
                     </nav>
 
-                    @if (selectedRule(); as rule) {
+                    @if (ruleForCategory(category); as rule) {
                       <div class="flex min-h-0 flex-col">
                         <div class="mb-1.5 flex min-w-0 items-center gap-1.5">
                           <label class="sr-only" for="rule-title">Rule title</label>
@@ -309,8 +309,6 @@
                           }
                         </section>
                       </div>
-                    } @else {
-                      <p class="text-[13px] italic text-slate-500">Select or create a rule.</p>
                     }
                   </div>
                 </div>

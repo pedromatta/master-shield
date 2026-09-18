@@ -23,7 +23,8 @@ export class RulesPanelComponent {
   private readonly store = inject(ContentStoreService);
 
   protected readonly categories = this.store.ruleCategories;
-  protected readonly selectedCategoryId = signal<string | null>(null);
+  /** Categories currently expanded; several may be open at once. */
+  protected readonly expandedIds = signal<Set<string>>(new Set());
   protected readonly selectedRuleId = signal<string | null>(null);
   protected readonly showCategoryForm = signal(false);
   protected readonly editingCategoryId = signal<string | null>(null);
@@ -39,15 +40,33 @@ export class RulesPanelComponent {
   protected readonly draftCategoryName = signal('');
 
   protected readonly selectedCategory = computed<RuleCategory | null>(
-    () => this.categories().find((category) => category.id === this.selectedCategoryId()) ?? null,
+    () =>
+      this.categories().find((category) =>
+        (category.rules ?? []).some((rule) => rule.id === this.selectedRuleId()),
+      ) ?? null,
   );
 
+  /** Rules of the category that owns the open rule (used by the editor pane). */
   protected readonly rules = computed(() => {
     const all = this.selectedCategory()?.rules ?? [];
     const tagIds = this.activeTagIds();
     if (tagIds.size === 0) return all;
     return all.filter((rule) => (rule.tags ?? []).some((tag) => tagIds.has(tag.id)));
   });
+
+  /** Rules of one category, honouring the tag filter. */
+  protected rulesFor(category: RuleCategory): Rule[] {
+    const all = category.rules ?? [];
+    const tagIds = this.activeTagIds();
+    if (tagIds.size === 0) return all;
+    return all.filter((rule) => (rule.tags ?? []).some((tag) => tagIds.has(tag.id)));
+  }
+
+  /** The rule to edit when a category is expanded: only the open rule of that category. */
+  protected ruleForCategory(category: RuleCategory): Rule | null {
+    const rule = this.selectedRule();
+    return rule && (category.rules ?? []).some((r) => r.id === rule.id) ? rule : null;
+  }
 
   protected readonly allTags = computed(() => this.store.tagsFor('Rule'));
   protected readonly activeTagIds = signal<Set<string>>(new Set());
@@ -98,12 +117,31 @@ export class RulesPanelComponent {
   protected readonly attachmentUrl = assetUrl;
 
   protected isCategorySelected(id: string): boolean {
-    return this.selectedCategoryId() === id;
+    return this.expandedIds().has(id);
   }
 
+  /** Toggles one category open/closed without touching the others. */
+  protected toggleCategory(id: string): void {
+    this.expandedIds.update((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  /** Expands a category (used when one is created) and opens its first rule. */
   protected selectCategory(id: string): void {
-    this.selectedCategoryId.set(id);
+    this.expandedIds.update((current) => new Set(current).add(id));
     this.selectedRuleId.set(this.categoryRules(id).at(0)?.id ?? null);
+  }
+
+  /** Returns whether a rule is the open one, for highlighting. */
+  protected isRuleSelected(id: string): boolean {
+    return this.selectedRuleId() === id;
   }
 
   private categoryRules(id: string): Rule[] {
@@ -184,9 +222,11 @@ export class RulesPanelComponent {
     event.stopPropagation();
     try {
       await this.store.deleteRuleCategory(category.id);
-      if (this.selectedCategoryId() === category.id) {
-        this.selectedCategoryId.set(this.categories().at(0)?.id ?? null);
-      }
+      this.expandedIds.update((current) => {
+        const next = new Set(current);
+        next.delete(category.id);
+        return next;
+      });
     } catch {
       this.error.set('Could not delete the category.');
     }
