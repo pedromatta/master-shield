@@ -10,6 +10,7 @@ import { Actor } from '../../core/models/actor.model';
 import { ResourceBarComponent, ResourceChange } from '../../shared/resource-bar/resource-bar.component';
 import { ImageUploadComponent } from '../../shared/image-upload/image-upload.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { IconPickerComponent } from '../../shared/icon/icon-picker.component';
 
 /**
  * Left rail of player-character cards. Each card shows the portrait as its icon, the
@@ -18,7 +19,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
  */
 @Component({
   selector: 'app-character-sidebar',
-  imports: [FormsModule, ResourceBarComponent, ImageUploadComponent, IconComponent],
+  imports: [FormsModule, ResourceBarComponent, IconComponent, IconPickerComponent],
   templateUrl: './character-sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +32,8 @@ export class CharacterSidebarComponent {
   protected readonly collapsed = signal(false);
   protected readonly showCreate = signal(false);
   protected readonly newName = signal('');
+  /** Icon chosen during creation ("" until the GM picks one). */
+  protected readonly newIconId = signal('');
   /** Portrait held in memory until the actor row exists to attach it to. */
   protected readonly newImageFile = signal<File | null>(null);
   protected readonly newImagePreview = signal('');
@@ -112,6 +115,7 @@ export class CharacterSidebarComponent {
       const created = await this.store.createActor({
         name,
         type: 'PlayerCharacter',
+        iconId: this.newIconId(),
         imageUri: '',
         systemData: {},
       });
@@ -120,6 +124,7 @@ export class CharacterSidebarComponent {
         await this.store.uploadActorImage(created.id, file);
       }
       this.newName.set('');
+      this.newIconId.set('');
       this.newImageFile.set(null);
       this.newImagePreview.set('');
       this.showCreate.set(false);
@@ -141,6 +146,26 @@ export class CharacterSidebarComponent {
       await this.store.uploadActorImage(actor.id, file);
     } catch {
       this.error.set('Could not upload the portrait.');
+    }
+  }
+
+  /** Saves a chosen catalogue icon onto a persisted character. */
+  protected async onCharacterIconChange(actor: Actor, iconId: string): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.store.updateActor({ ...actor, iconId });
+    } catch {
+      this.error.set('Could not save the icon.');
+    }
+  }
+
+  /** Removes a character's uploaded portrait so its icon shows instead. */
+  protected async onCharacterImageCleared(actor: Actor): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.store.clearActorImage(actor.id);
+    } catch {
+      this.error.set('Could not clear the portrait.');
     }
   }
 }
