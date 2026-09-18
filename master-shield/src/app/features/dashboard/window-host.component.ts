@@ -13,6 +13,7 @@ import { EncounterTrackerComponent } from '../encounter/encounter-tracker.compon
 import { SessionsWindowComponent } from '../campaign/sessions-window.component';
 import { CampaignsWindowComponent } from '../campaign/campaigns-window.component';
 import { GameSystemManagerComponent } from '../campaign/game-system-manager.component';
+import { ThemeSettingsComponent } from '../settings/theme-settings.component';
 import { ActiveGameStateService } from '../../core/services/active-game-state.service';
 import { IconComponent } from '../../shared/icon/icon.component';
 
@@ -36,6 +37,7 @@ import { IconComponent } from '../../shared/icon/icon.component';
     CampaignsWindowComponent,
     GameSystemManagerComponent,
     IconComponent,
+    ThemeSettingsComponent,
   ],
   templateUrl: './window-host.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -12,7 +12,8 @@ export type WindowKind =
   | 'map'
   | 'sessions'
   | 'campaigns'
-  | 'systems';
+  | 'systems'
+  | 'settings';
 
 export interface AppWindow {
   readonly id: string;
@@ -55,6 +56,7 @@ const DEFAULT_META: Record<WindowKind, { title: string; icon: string }> = {
   sessions: { title: 'Sessions', icon: 'lu:calendar' },
   campaigns: { title: 'Campaigns', icon: 'ra:tower' },
   systems: { title: 'Game systems', icon: 'ra:book' },
+  settings: { title: 'Theme', icon: 'lu:palette' },
 };
 
 /**
