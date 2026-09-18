@@ -93,7 +93,7 @@
           class="flex w-full items-center gap-2 px-2 py-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           [class]="isCategorySelected(null) ? 'bg-surface-raised' : 'hover:bg-surface-panel'"
           [attr.aria-expanded]="isCategorySelected(null)"
-          (click)="selectCategory(null)"
+          (click)="toggleBucket(null)"
         >
           <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(null)" aria-hidden="true">▶</span>
           <app-icon name="lu:folder" [size]="13" />
@@ -102,7 +102,7 @@
         </button>
         @if (isCategorySelected(null)) {
           <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
-            <ng-container *ngTemplateOutlet="editorTpl" />
+            <ng-container *ngTemplateOutlet="editorTpl; context: { $implicit: allKey }" />
           </div>
         }
       </li>
@@ -114,7 +114,7 @@
               type="button"
               class="flex min-w-0 flex-1 items-center gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               [attr.aria-expanded]="isCategorySelected(category.id)"
-              (click)="selectCategory(category.id)"
+              (click)="toggleBucket(category.id)"
             >
               <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected(category.id)" aria-hidden="true">▶</span>
               @if (category.iconUri) {
@@ -125,12 +125,12 @@
               <span class="min-w-0 flex-1 truncate text-xs font-medium" [class]="isCategorySelected(category.id) ? 'text-sky-300' : 'text-slate-200'">{{ category.name }}</span>
               <span class="shrink-0 rounded bg-surface-raised px-1 text-[11px] text-slate-400">{{ countForCategory(category.id) }}</span>
             </button>
-            <app-image-upload
-              [compact]="true"
+            <app-icon-picker
               label="Icon"
+              [value]="category.iconId ?? ''"
               [imageUri]="category.iconUri"
-              [alt]="category.name"
-              (fileChosen)="onCategoryIconChosen(category, $event)"
+              (iconChange)="onCategoryIconChange(category, $event)"
+              (imageChosen)="onCategoryIconChosen(category, $event)"
             />
             <button
               type="button"
@@ -143,7 +143,7 @@
           </div>
           @if (isCategorySelected(category.id)) {
             <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
-              <ng-container *ngTemplateOutlet="editorTpl" />
+              <ng-container *ngTemplateOutlet="editorTpl; context: { $implicit: category.id }" />
             </div>
           }
         </li>
@@ -155,7 +155,7 @@
           class="flex w-full items-center gap-2 px-2 py-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           [class]="isCategorySelected('uncategorised') ? 'bg-surface-raised' : 'hover:bg-surface-panel'"
           [attr.aria-expanded]="isCategorySelected('uncategorised')"
-          (click)="selectCategory('uncategorised')"
+          (click)="toggleBucket(uncategorisedKey)"
         >
           <span class="shrink-0 text-[12px] text-slate-500 transition" [class.rotate-90]="isCategorySelected('uncategorised')" aria-hidden="true">▶</span>
           <app-icon name="lu:file-text" [size]="13" />
@@ -164,7 +164,7 @@
         </button>
         @if (isCategorySelected('uncategorised')) {
           <div class="border-t-2 border-slate-700 bg-surface-inset p-2">
-            <ng-container *ngTemplateOutlet="editorTpl" />
+            <ng-container *ngTemplateOutlet="editorTpl; context: { $implicit: uncategorisedKey }" />
           </div>
         }
       </li>
@@ -172,14 +172,14 @@
   </div>
 
   <!-- Shared note list + editor, rendered beneath the expanded category. -->
-  <ng-template #editorTpl>
+  <ng-template #editorTpl let-bucket>
     <div class="grid min-h-0 grid-cols-[9rem_minmax(0,1fr)] gap-2">
       <nav class="max-h-64 overflow-y-auto" aria-label="Notes">
-        @if (visibleNotes().length === 0) {
+        @if (bucketNotes(bucket).length === 0) {
           <p class="px-1 py-1 text-[12px] italic text-slate-600">No notes here yet.</p>
         } @else {
           <ul class="space-y-0.5">
-            @for (note of visibleNotes(); track trackNote($index, note)) {
+            @for (note of bucketNotes(bucket); track trackNote($index, note)) {
               <li>
                 <button
                   type="button"

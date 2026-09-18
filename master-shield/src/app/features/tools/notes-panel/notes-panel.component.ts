@@ -10,12 +10,13 @@ import { assetUrl } from '../../../core/services/asset-url';
 import { TagEditorComponent } from '../../../shared/tag-editor/tag-editor.component';
 import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
+import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { MarkdownEditorComponent } from '../../../shared/markdown-editor/markdown-editor.component';
 
 /** Notes panel: category sidebar on the left, note editor on the right. */
 @Component({
   selector: 'app-notes-panel',
-  imports: [FormsModule, TagEditorComponent, ImageUploadComponent, NgTemplateOutlet, IconComponent, MarkdownEditorComponent],
+  imports: [FormsModule, TagEditorComponent, ImageUploadComponent, NgTemplateOutlet, IconComponent, IconPickerComponent, MarkdownEditorComponent],
   templateUrl: './notes-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,7 +24,8 @@ export class NotesPanelComponent {
   private readonly store = inject(ContentStoreService);
 
   /** `null` means "All notes"; `'uncategorised'` is the bucket without a category. */
-  protected readonly selectedCategoryId = signal<string | null>(null);
+  /** Expanded accordion buckets; several may be open at once. */
+  protected readonly expandedKeys = signal<Set<string>>(new Set());
   protected readonly selectedNoteId = signal<string | null>(null);
   protected readonly search = signal('');
   protected readonly showCategoryForm = signal(false);
@@ -36,28 +38,48 @@ export class NotesPanelComponent {
 
   protected readonly categories = this.store.noteCategories;
 
-  protected readonly selectedCategory = computed<NoteCategory | null>(
-    () => this.categories().find((c) => c.id === this.selectedCategoryId()) ?? null,
-  );
+  /** The key used for the "All notes" and "Uncategorised" buckets in the accordion. */
+  protected readonly allKey = 'all';
+  protected readonly uncategorisedKey = 'uncategorised';
 
-  /** Notes visible for the active category, honouring the search box. */
-  protected readonly visibleNotes = computed(() => {
-    const categoryId = this.selectedCategoryId();
+  /** Notes visible for a given bucket, honouring the search box and tag filter. */
+  protected notesFor(bucket: string | null): Note[] {
     const term = this.search().trim().toLowerCase();
     const tagIds = this.activeTagIds();
 
     return [...this.store.notes()]
       .filter((note) => {
-        if (categoryId === 'uncategorised') return note.noteCategoryId === null;
-        if (categoryId !== null) return note.noteCategoryId === categoryId;
-        return true;
+        if (bucket === null) return true;
+        if (bucket === this.uncategorisedKey) return note.noteCategoryId === null;
+        return note.noteCategoryId === bucket;
       })
       .filter((note) => !term || note.title.toLowerCase().includes(term))
       .filter(
         (note) => tagIds.size === 0 || (note.tags ?? []).some((tag) => tagIds.has(tag.id)),
       )
       .sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  /** The notes of the bucket that owns the open note (used by the editor pane). */
+  protected readonly visibleNotes = computed(() => this.notesFor(null));
+
+  /** The open note, kept in a computed so the editor reacts to store changes. */
+  protected readonly selectedCategory = computed<NoteCategory | null>(() => {
+    const note = this.selectedNote();
+    return note?.noteCategoryId
+      ? (this.categories().find((c) => c.id === note.noteCategoryId) ?? null)
+      : null;
   });
+
+  /** The bucket key that contains the open note, so only that pane renders the editor. */
+  protected bucketForNote(note: Note): string {
+    return note.noteCategoryId ?? this.uncategorisedKey;
+  }
+
+  /** Notes to show inside one expanded bucket. */
+  protected bucketNotes(bucket: string): Note[] {
+    return this.notesFor(bucket === this.uncategorisedKey ? this.uncategorisedKey : bucket);
+  }
 
   protected readonly allTags = computed(() => this.store.tagsFor('Note'));
   protected readonly activeTagIds = signal<Set<string>>(new Set());
@@ -82,17 +104,24 @@ export class NotesPanelComponent {
     () => this.store.notes().find((note) => note.id === this.selectedNoteId()) ?? null,
   );
 
-  /** Position of the open note inside its category, for prev/next navigation. */
-  protected readonly noteIndex = computed(() =>
-    this.visibleNotes().findIndex((note) => note.id === this.selectedNoteId()),
-  );
+  /** Position of the open note inside its bucket, for prev/next navigation. */
+  protected readonly noteIndex = computed(() => {
+    const note = this.selectedNote();
+    if (!note) return -1;
+    return this.notesFor(this.bucketForNote(note)).findIndex((n) => n.id === note.id);
+  });
 
   protected readonly canGoPrevious = computed(() => this.noteIndex() > 0);
 
   protected readonly canGoNext = computed(() => {
     const index = this.noteIndex();
-    return index >= 0 && index < this.visibleNotes().length - 1;
+    return index >= 0 && index < this.notesFor(this.bucketForCurrentNote()).length - 1;
   });
+
+  private bucketForCurrentNote(): string {
+    const note = this.selectedNote();
+    return note ? this.bucketForNote(note) : this.uncategorisedKey;
+  }
 
   protected countForCategory(categoryId: string | null): number {
     if (categoryId === null) return this.store.notes().length;
@@ -103,17 +132,28 @@ export class NotesPanelComponent {
   }
 
   protected isCategorySelected(id: string | null): boolean {
-    return this.selectedCategoryId() === id;
+    const key = id ?? this.allKey;
+    return this.expandedKeys().has(key);
   }
 
-  protected selectCategory(id: string | null): void {
-    this.selectedCategoryId.set(id);
+  /** Toggles one bucket open/closed without touching the others. */
+  protected toggleBucket(id: string | null): void {
+    const key = id ?? this.allKey;
+    this.expandedKeys.update((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
 
-    // Keep a note open when navigating, so the GM can page through a category.
-    const notes = this.visibleNotes();
-    if (!notes.some((note) => note.id === this.selectedNoteId())) {
-      this.selectedNoteId.set(notes.at(0)?.id ?? null);
-    }
+  /** Expands a bucket (kept for callers that need a deterministic open). */
+  protected selectCategory(id: string | null): void {
+    const key = id ?? this.allKey;
+    this.expandedKeys.update((current) => new Set(current).add(key));
   }
 
   protected trackNote(_index: number, note: Note): string {
@@ -131,15 +171,15 @@ export class NotesPanelComponent {
   protected readonly attachmentUrl = assetUrl;
 
   protected async createNote(): Promise<void> {
-    const categoryId = this.selectedCategoryId();
-    const title = 'New note';
+    // Create inside the first expanded bucket so the new note lands where the GM is looking.
+    const bucket = [...this.expandedKeys()][0] ?? this.allKey;
+    const categoryId =
+      bucket === this.allKey || bucket === this.uncategorisedKey ? null : bucket;
 
     try {
-      const created = await this.store.createNote(
-        title,
-        categoryId && categoryId !== 'uncategorised' ? categoryId : null,
-      );
+      const created = await this.store.createNote('New note', categoryId);
       this.selectedNoteId.set(created.id);
+      if (categoryId) this.selectCategory(categoryId);
     } catch {
       this.error.set('Could not create the note.');
     }
@@ -221,7 +261,7 @@ export class NotesPanelComponent {
       this.newCategoryIconFile.set(null);
       this.newCategoryIconPreview.set('');
       this.showCategoryForm.set(false);
-      this.selectedCategoryId.set(created.id);
+      this.expandedKeys.update((current) => new Set(current).add(created.id));
     } catch {
       this.error.set('Could not create the category.');
     }
@@ -230,6 +270,16 @@ export class NotesPanelComponent {
   protected onNewCategoryIconChosen(file: File): void {
     this.newCategoryIconFile.set(file);
     this.newCategoryIconPreview.set(URL.createObjectURL(file));
+  }
+
+  /** Saves the chosen catalogue icon onto the category. */
+  protected async onCategoryIconChange(category: NoteCategory, iconId: string): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.store.updateNoteCategory({ ...category, iconId });
+    } catch {
+      this.error.set('Could not save the category icon.');
+    }
   }
 
   /** Uploads a replacement icon directly against the persisted category. */
@@ -270,9 +320,11 @@ export class NotesPanelComponent {
     event.stopPropagation();
     try {
       await this.store.deleteNoteCategory(category.id);
-      if (this.selectedCategoryId() === category.id) {
-        this.selectedCategoryId.set(null);
-      }
+      this.expandedKeys.update((current) => {
+        const next = new Set(current);
+        next.delete(category.id);
+        return next;
+      });
     } catch {
       this.error.set('Could not delete the category.');
     }
