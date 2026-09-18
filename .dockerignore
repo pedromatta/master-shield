@@ -1,0 +1,31 @@
+# Keep the build context small and avoid leaking local build output or secrets
+# into images.
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Angular build output and dependencies
+master-shield/node_modules/
+master-shield/dist/
+master-shield/.angular/
+
+# Runtime uploads (served from a volume in the container)
+MasterShield/wwwroot/uploads/
+
+# Environment secrets — never bake these into an image.
+.env
+*.env.local
+
+# Editor / VCS noise
+.git/
+.gitignore
+**/.vs/
+**/.vscode/
+**/*.user
+
+# AI assistant metadata
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md

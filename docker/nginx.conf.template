@@ -1,0 +1,38 @@
+# ---------------------------------------------------------------------------
+# nginx config for the Master Shield frontend.
+#
+# Serves the built Angular SPA and reverse-proxies the API so the browser sees a
+# single origin. `API_UPSTREAM` and `NGINX_PORT` are substituted at container
+# start by the nginx image entrypoint (envsubst).
+# ---------------------------------------------------------------------------
+server {
+    listen ${NGINX_PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Uploaded media can be large; allow generous bodies for image posts.
+    client_max_body_size 30m;
+
+    # API traffic, including uploads served by the API's static-file middleware.
+    location /api/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /uploads/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
+    # Angular client-side routing: fall back to index.html for unknown paths.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
