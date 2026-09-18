@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { OverlayModule } from '@angular/cdk/overlay'
 import { ALL_ICONS, IconOption } from './icon-catalog';
 import { IconComponent } from './icon.component';
 import { ImageUploadComponent } from '../image-upload/image-upload.component';
@@ -21,7 +21,7 @@ import { ImageUploadComponent } from '../image-upload/image-upload.component';
  */
 @Component({
   selector: 'app-icon-picker',
-  imports: [FormsModule, IconComponent, ImageUploadComponent],
+  imports: [FormsModule, IconComponent, ImageUploadComponent, OverlayModule],
   templateUrl: './icon-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -71,11 +71,15 @@ export class IconPickerComponent {
   }
 
   protected choose(icon: IconOption): void {
+    // Choosing a glyph replaces any uploaded image, so the two never conflict.
+    if (this.imageUri()) this.imageCleared.emit();
     this.iconChange.emit(icon.id);
     this.open.set(false);
   }
 
+  /** Clears both the uploaded image and the selected glyph. */
   protected clear(): void {
+    if (this.imageUri()) this.imageCleared.emit();
     this.iconChange.emit('');
   }
 

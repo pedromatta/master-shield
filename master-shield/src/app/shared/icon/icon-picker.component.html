@@ -1,12 +1,12 @@
 <div class="relative">
-  <span class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">{{ label() }}</span>
+  <span class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">{{ label() }}</span>
 
-  <div class="flex items-center gap-1.5">
+  <div class="relative flex items-center gap-1.5">
     <button
+      #trigger="cdkOverlayOrigin"
+      cdkOverlayOrigin
       type="button"
-      class="flex size-10 items-center justify-center overflow-hidden rounded border border-slate-700 bg-slate-950 text-slate-200 transition hover:border-sky-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-      [attr.aria-expanded]="open()"
-      [attr.aria-label]="label() + ' — choose an icon'"
+      class="relative flex size-10 items-center justify-center overflow-hidden rounded border border-slate-700 bg-slate-950 text-slate-200 transition hover:border-sky-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       (click)="toggle()"
     >
       @if (imageUri()) {
@@ -16,29 +16,26 @@
       }
     </button>
 
-    <div class="flex flex-col gap-0.5">
+    @if (value() || imageUri()) {
       <button
         type="button"
-        class="rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-        (click)="toggle()"
+        class="absolute right-0 top-0 z-10 flex size-4 -translate-x-5 -translate-y-1/4 items-center justify-center rounded-full bg-slate-900 text-xs leading-none text-slate-400 transition hover:bg-rose-950 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        aria-label="Clear"
+        (click)="clear()"
       >
-        Pick
+        ×
       </button>
-      @if (value() || imageUri()) {
-        <button
-          type="button"
-          class="rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-500 transition hover:border-rose-700 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-          (click)="clear()"
-        >
-          Clear
-        </button>
-      }
-    </div>
+    }
   </div>
 
-  @if (open()) {
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="open()"
+    (overlayOutsideClick)="open.set(false)"
+  >
     <div
-      class="absolute z-30 mt-1 w-72 rounded-lg border border-slate-700 bg-surface-panel p-2 shadow-2xl shadow-black/50"
+      class="z-30 w-72 rounded-lg border border-slate-700 bg-surface-panel p-2 shadow-2xl shadow-black/50"
       role="dialog"
       aria-label="Choose an icon"
     >
@@ -48,16 +45,16 @@
           id="icon-search"
           type="search"
           placeholder="Search icons…"
-          class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+          class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
           [value]="search()"
           (input)="search.set($any($event.target).value)"
         />
-        <span class="shrink-0 text-[9px] text-slate-500">{{ resultCount() }}</span>
+        <span class="shrink-0 text-[11px] text-slate-500">{{ resultCount() }}</span>
       </div>
 
       <!-- Image upload option -->
       <label
-        class="mb-2 flex cursor-pointer items-center gap-2 rounded border border-dashed border-slate-700 px-2 py-1.5 text-[11px] text-slate-400 transition hover:border-sky-600 hover:text-sky-300"
+        class="mb-2 flex cursor-pointer items-center gap-2 rounded border border-dashed border-slate-700 px-2 py-1.5 text-[13px] text-slate-400 transition hover:border-sky-600 hover:text-sky-300"
       >
         <app-icon name="lu:upload" [size]="14" />
         Upload an image instead
@@ -71,11 +68,11 @@
 
       <div class="max-h-64 overflow-y-auto pr-1">
         @if (resultCount() === 0) {
-          <p class="py-3 text-center text-[11px] italic text-slate-500">No icons match.</p>
+          <p class="py-3 text-center text-[13px] italic text-slate-500">No icons match.</p>
         } @else {
           @for (group of groups(); track group.name) {
             <div class="mb-2">
-              <p class="mb-1 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+              <p class="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 {{ group.name }}
               </p>
               <ul class="grid grid-cols-8 gap-0.5">
@@ -102,12 +99,12 @@
       <div class="mt-1 flex justify-end">
         <button
           type="button"
-          class="rounded border border-slate-700 px-2 py-0.5 text-[10px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          class="rounded border border-slate-700 px-2 py-0.5 text-[12px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           (click)="open.set(false)"
         >
           Close
         </button>
       </div>
     </div>
-  }
+  </ng-template>
 </div>
