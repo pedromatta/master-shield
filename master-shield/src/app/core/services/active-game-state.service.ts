@@ -189,15 +189,16 @@ export class ActiveGameStateService {
   }
 
   /** Creates a session in the active campaign and selects it. */
-  async createSession(title: string): Promise<Session> {
+  async createSession(title?: string): Promise<Session> {
     const campaignId = this._activeCampaignId();
     if (!campaignId) {
       throw new Error('Select a campaign before creating a session.');
     }
 
+    // Sessions are numbered and named by the API ("Session #N"); the title is optional.
     const created = await this.sessionService.create({
       campaignId,
-      title: title.trim(),
+      title: title?.trim() ?? '',
     });
 
     this._sessions.update((sessions) =>
@@ -206,6 +207,9 @@ export class ActiveGameStateService {
     this._activeSessionId.set(created.id);
     this._activeEncounterId.set(null);
     writeStorage(ACTIVE_ENCOUNTER_KEY, null);
+
+    // A fresh session always has an encounter to drop combatants into.
+    await this.loadActiveEncounter(created.id);
     return created;
   }
 
@@ -236,7 +240,13 @@ export class ActiveGameStateService {
 
   async loadSessions(campaignId: string): Promise<void> {
     try {
-      const sessions = await this.sessionService.listByCampaign(campaignId);
+      let sessions = await this.sessionService.listByCampaign(campaignId);
+
+      // The GM is never left without a session: ask the API to provision the first one.
+      if (sessions.length === 0) {
+        sessions = [await this.sessionService.ensure(campaignId)];
+      }
+
       this._sessions.set([...sessions].sort((a, b) => b.sessionNumber - a.sessionNumber));
 
       // Keep the GM on their current session when it still exists.
@@ -244,7 +254,7 @@ export class ActiveGameStateService {
       const target = current ?? this._sessions().at(0) ?? null;
       this._activeSessionId.set(target?.id ?? null);
 
-      if (target && !current) {
+      if (target) {
         await this.loadActiveEncounter(target.id);
       }
     } catch {
@@ -255,7 +265,13 @@ export class ActiveGameStateService {
 
   async loadActiveEncounter(sessionId: string): Promise<Encounter | null> {
     try {
-      const encounters = await this.encounterService.listBySession(sessionId);
+      let encounters = await this.encounterService.listBySession(sessionId);
+
+      // Every session keeps at least one encounter, created on demand.
+      if (encounters.length === 0) {
+        encounters = [await this.encounterService.ensure(sessionId)];
+      }
+
       const active = encounters.find((e) => e.isActive) ?? encounters.at(-1) ?? null;
       this.setActiveEncounter(active?.id ?? null);
       return active;

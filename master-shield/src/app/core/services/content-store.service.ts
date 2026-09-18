@@ -149,6 +149,7 @@ export class ContentStoreService {
     type: Actor['type'];
     notes?: string;
     imageUri?: string;
+    iconId?: string;
     systemData?: Actor['systemData'];
   }): Promise<Actor> {
     const campaignId = this.requireCampaign();
@@ -158,6 +159,7 @@ export class ContentStoreService {
       type: input.type,
       notes: input.notes ?? '',
       imageUri: input.imageUri ?? '',
+      iconId: input.iconId ?? '',
       systemData: input.systemData ?? {},
     });
 
@@ -180,6 +182,14 @@ export class ContentStoreService {
     const imageUri = await this.uploads.uploadActorImage(actorId, file);
     this._actors.update((actors) =>
       actors.map((a) => (a.id === actorId ? { ...a, imageUri } : a)),
+    );
+  }
+
+  /** Clears an actor's uploaded portrait so its icon is shown instead. */
+  async clearActorImage(actorId: string): Promise<void> {
+    await this.uploads.clearActorImage(actorId);
+    this._actors.update((actors) =>
+      actors.map((a) => (a.id === actorId ? { ...a, imageUri: '' } : a)),
     );
   }
 
@@ -527,11 +537,12 @@ export class ContentStoreService {
 
   // ---- Rules ----------------------------------------------------------------
 
-  async createRuleCategory(name: string, icon: string): Promise<RuleCategory> {
+  async createRuleCategory(name: string, icon: string, iconId = ''): Promise<RuleCategory> {
     const created = await this.content.createRuleCategory({
       campaignId: this.requireCampaign(),
       name: name.trim(),
       icon,
+      iconId,
       showInToolbar: true,
     });
     this._ruleCategories.update((categories) => [
