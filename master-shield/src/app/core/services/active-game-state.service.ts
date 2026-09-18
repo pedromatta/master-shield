@@ -8,10 +8,10 @@ import { EncounterService } from './encounter.service';
 import { UserService, UserSummary } from './user.service';
 import { GameSystemService } from './game-system.service';
 import { GameSystem } from '../models/common.model';
+import { AuthService } from './auth.service';
 
 const ACTIVE_CAMPAIGN_KEY = 'master-shield.activeCampaignId';
 const ACTIVE_ENCOUNTER_KEY = 'master-shield.activeEncounterId';
-const ACTIVE_USER_KEY = 'master-shield.activeUserId';
 
 /**
  * Globally tracks the campaign/encounter the GM is currently running.
@@ -24,13 +24,13 @@ export class ActiveGameStateService {
   private readonly sessionService = inject(SessionService);
   private readonly userService = inject(UserService);
   private readonly gameSystemService = inject(GameSystemService);
+  private readonly auth = inject(AuthService);
 
   private readonly _campaigns = signal<Campaign[]>([]);
   private readonly _users = signal<UserSummary[]>([]);
   private readonly _gameSystems = signal<GameSystem[]>([]);
   private readonly _sessions = signal<Session[]>([]);
   private readonly _activeCampaignId = signal<string | null>(readStorage(ACTIVE_CAMPAIGN_KEY));
-  private readonly _activeUserId = signal<string | null>(readStorage(ACTIVE_USER_KEY));
   private readonly _activeEncounterId = signal<string | null>(readStorage(ACTIVE_ENCOUNTER_KEY));
   /**
    * Bumped whenever encounter membership changes elsewhere (adding a combatant from a sheet,
@@ -47,7 +47,6 @@ export class ActiveGameStateService {
   readonly gameSystems = this._gameSystems.asReadonly();
   readonly sessions = this._sessions.asReadonly();
   readonly activeCampaignId = this._activeCampaignId.asReadonly();
-  readonly activeUserId = this._activeUserId.asReadonly();
   readonly activeEncounterId = this._activeEncounterId.asReadonly();
   readonly encounterRevision = this._encounterRevision.asReadonly();
   readonly activeSessionId = this._activeSessionId.asReadonly();
@@ -58,9 +57,10 @@ export class ActiveGameStateService {
     () => this._campaigns().find((c) => c.id === this._activeCampaignId()) ?? null,
   );
 
-  readonly activeUser = computed(
-    () => this._users().find((u) => u.id === this._activeUserId()) ?? this._users().at(0) ?? null,
-  );
+  readonly activeUser = computed(() => {
+    const user = this.auth.user();
+    return user ? { id: user.id, username: user.username, email: '' } : null;
+  });
 
   readonly hasNoCampaigns = computed(() => !this._loading() && this._campaigns().length === 0);
 
@@ -72,6 +72,7 @@ export class ActiveGameStateService {
     this._loading.set(true);
     this._error.set(null);
     try {
+      // Campaigns are scoped to the signed-in user by the API; no client-side owner filter.
       const [campaigns, users, gameSystems] = await Promise.all([
         this.campaignService.list(),
         this.userService.list().catch(() => []),
@@ -81,10 +82,6 @@ export class ActiveGameStateService {
       this._campaigns.set(campaigns);
       this._users.set(users);
       this._gameSystems.set(gameSystems);
-
-      if (users.length > 0 && !users.some((u) => u.id === this._activeUserId())) {
-        this.setActiveUser(users.at(0)!.id);
-      }
 
       if (!campaigns.some((c) => c.id === this._activeCampaignId())) {
         await this.setActiveCampaign(campaigns.at(0)?.id ?? null);
@@ -98,9 +95,9 @@ export class ActiveGameStateService {
     }
   }
 
-  setActiveUser(userId: string | null): void {
-    this._activeUserId.set(userId);
-    writeStorage(ACTIVE_USER_KEY, userId);
+  /** Kept for the account-management screens; the active user now comes from the session. */
+  setActiveUser(_userId: string | null): void {
+    // No-op: ownership follows the auth cookie, not a browser-stored selection.
   }
 
   /** Updates an account's profile fields and reflects the change locally. */
@@ -110,16 +107,13 @@ export class ActiveGameStateService {
     return updated;
   }
 
-  /** Removes an account. The active selection falls back to the first remaining user. */
+  /** Removes an account from the cached list. */
   async deleteUser(id: string): Promise<void> {
     await this.userService.delete(id);
     this._users.update((users) => users.filter((u) => u.id !== id));
-    if (this._activeUserId() === id) {
-      this.setActiveUser(this._users().at(0)?.id ?? null);
-    }
   }
 
-  /** Creates a user account, makes it active and returns it. */
+  /** Creates an account (admin flow) and reflects it locally. */
   async createUser(username: string, email: string, password: string): Promise<UserSummary> {
     const created = await this.userService.create({
       username: username.trim(),
@@ -133,28 +127,21 @@ export class ActiveGameStateService {
   }
 
   /**
-   * Creates a campaign for the active user, then makes it the active campaign.
-   * Without a user account the campaign has no owner, so one is created first if needed.
+   * Creates a campaign owned by the signed-in user, then makes it active. Ownership is
+   * stamped server-side from the auth cookie.
    */
   async createCampaign(input: {
     name: string;
     gameSystemId?: string | null;
-    userId?: string | null;
   }): Promise<Campaign> {
-    const owner = input.userId ?? this.activeUser()?.id ?? null;
-    if (!owner) {
-      throw new Error('An account is required before a campaign can be created.');
-    }
-
     const created = await this.campaignService.create({
-      userId: owner,
+      userId: '',
       name: input.name.trim(),
       gameSystemId: input.gameSystemId ?? null,
       systemData: {},
     } satisfies CampaignCreate);
 
     this._campaigns.update((campaigns) => [...campaigns, created]);
-    this.setActiveUser(owner);
     await this.setActiveCampaign(created.id);
     return created;
   }
