@@ -24,16 +24,16 @@
       </span>
     }
 
-    <span class="line-clamp-2 w-full text-[11px] font-medium leading-tight text-slate-100">
+    <span class="line-clamp-2 w-full text-[13px] font-medium leading-tight text-slate-100">
       {{ a.name }}
     </span>
-    <span class="text-[9px] uppercase tracking-wide text-slate-500">{{ typeLabel() }}</span>
+    <span class="text-[11px] uppercase tracking-wide text-slate-500">{{ typeLabel() }}</span>
 
     @if (topTags().length > 0) {
       <span class="flex flex-wrap justify-center gap-0.5">
         @for (tag of topTags(); track tag.id) {
           <span
-            class="rounded-full border px-1 text-[8px] leading-tight"
+            class="rounded-full border px-1 text-[10px] leading-tight"
             [style]="tagStyle(tag)"
           >
             {{ tag.name }}
@@ -46,7 +46,7 @@
   @if (showAddToEncounter()) {
     <button
       type="button"
-      class="absolute right-1 top-1 grid size-5 place-items-center rounded border border-slate-700 bg-slate-950/90 text-[10px] opacity-0 transition hover:border-amber-500 hover:text-amber-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/card:opacity-100"
+      class="absolute right-1 top-1 grid size-5 place-items-center rounded border border-slate-700 bg-slate-950/90 text-[12px] opacity-0 transition hover:border-amber-500 hover:text-amber-400 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sky-500 group-hover/card:opacity-100"
       [attr.aria-label]="'Add ' + a.name + ' to the encounter'"
       (click)="onAdd($event)"
     >

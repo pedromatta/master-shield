@@ -1,5 +1,5 @@
 <article
-  class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border-2 bg-surface-panel shadow-md shadow-black/50 transition-colors"
+  class="flex h-full min-h-0 w-full flex-col overflow-visible isolate rounded-lg border-2 bg-surface-panel shadow-md shadow-black/50 transition-colors"
   [class]="dragging() || resizing() ? 'border-sky-600' : 'border-slate-700'"
 >
   <!-- Title bar: a bronze rule under carved chrome reads as a framed panel. -->
@@ -21,7 +21,7 @@
         [attr.aria-pressed]="isMinimized()"
         (click)="toggleMinimized()"
       >
-        <span aria-hidden="true" class="text-[10px]">▁</span>
+        <span aria-hidden="true" class="text-[12px]">▁</span>
       </button>
 
       <button
@@ -31,7 +31,7 @@
         [attr.aria-pressed]="isMaximized()"
         (click)="toggleMaximized()"
       >
-        <span aria-hidden="true" class="text-[10px]">
+        <span aria-hidden="true" class="text-[12px]">
           @if (isMaximized()) {
             <app-icon name="lu:minimize" [size]="12" />
           } @else {

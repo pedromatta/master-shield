@@ -2,7 +2,7 @@
   <header class="mb-2 flex flex-wrap items-center gap-1.5">
     <h3 class="mr-auto text-xs font-semibold text-slate-200">System content</h3>
 
-    <label class="cursor-pointer rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
+    <label class="cursor-pointer rounded border border-slate-700 px-2 py-1 text-[13px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
       Import list
       <input
         type="file"
@@ -13,14 +13,14 @@
     </label>
     <button
       type="button"
-      class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="rounded border border-slate-700 px-2 py-1 text-[13px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       (click)="exportList()"
     >
       Export list
     </button>
     <button
       type="button"
-      class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+      class="rounded bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
       [disabled]="busy()"
       (click)="startCreate()"
     >
@@ -29,12 +29,12 @@
   </header>
 
   @if (error()) {
-    <p class="mb-2 rounded border border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+    <p class="mb-2 rounded border border-rose-900 bg-rose-950/60 px-2 py-1 text-[13px] text-rose-300" role="alert">
       {{ error() }}
     </p>
   }
   @if (status()) {
-    <p class="mb-2 rounded border border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[11px] text-emerald-300" role="status">
+    <p class="mb-2 rounded border border-emerald-900 bg-emerald-950/50 px-2 py-1 text-[13px] text-emerald-300" role="status">
       {{ status() }}
     </p>
   }
@@ -45,7 +45,7 @@
       @for (kind of kinds; track kind) {
         <button
           type="button"
-          class="rounded px-2 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          class="rounded px-2 py-1 text-[13px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           [class]="
             editedKind() === kind
               ? 'bg-surface-raised font-medium text-sky-300'
@@ -55,7 +55,7 @@
           (click)="activeKind.set(kind)"
         >
           {{ kind }}s
-          <span class="text-[9px] text-slate-500">{{ countFor(kind) }}</span>
+          <span class="text-[11px] text-slate-500">{{ countFor(kind) }}</span>
         </button>
       }
     </nav>
@@ -65,7 +65,7 @@
     <div class="mb-2 space-y-1.5 rounded border border-slate-700 bg-surface-panel p-2">
       <div class="flex flex-wrap items-end gap-2">
         <div class="min-w-0 flex-1">
-          <label for="tpl-name" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">Name</label>
+          <label for="tpl-name" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">Name</label>
           <input
             id="tpl-name"
             type="text"
@@ -76,7 +76,7 @@
           />
         </div>
         <div class="w-40">
-          <label for="tpl-category" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+          <label for="tpl-category" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
             {{ categoryLabel(editedKind()) }}
           </label>
           @if (categoryOptions(editedKind()).length > 0) {
@@ -103,7 +103,7 @@
         </div>
         <button
           type="button"
-          class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+          class="rounded bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
           [disabled]="busy() || !draftName().trim()"
           (click)="create()"
         >
@@ -111,7 +111,7 @@
         </button>
         <button
           type="button"
-          class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          class="rounded border border-slate-700 px-2 py-1 text-[13px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           (click)="cancelCreate()"
         >
           Cancel
@@ -122,7 +122,7 @@
         id="tpl-desc"
         rows="2"
         placeholder="Description / content"
-        class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+        class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
         [value]="draftDescription()"
         (input)="draftDescription.set($any($event.target).value)"
       ></textarea>
@@ -130,9 +130,9 @@
   }
 
   @if (loading()) {
-    <p class="py-3 text-center text-[11px] italic text-slate-500">Loading…</p>
+    <p class="py-3 text-center text-[13px] italic text-slate-500">Loading…</p>
   } @else if (visible().length === 0) {
-    <p class="py-3 text-center text-[11px] italic text-slate-500">
+    <p class="py-3 text-center text-[13px] italic text-slate-500">
       No {{ editedKind().toLowerCase() }} entities yet.
     </p>
   } @else {
@@ -142,21 +142,21 @@
           <div class="flex items-center gap-2 p-1.5">
             <button
               type="button"
-              class="min-w-0 flex-1 truncate text-left text-[11px] text-slate-200 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+              class="min-w-0 flex-1 truncate text-left text-[13px] text-slate-200 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
               [attr.aria-expanded]="isExpanded(entry)"
               (click)="toggle(entry)"
             >
               {{ entry.name }}
               @if (entry.category) {
-                <span class="text-[9px] text-slate-500">· {{ entry.category }}</span>
+                <span class="text-[11px] text-slate-500">· {{ entry.category }}</span>
               }
               @if (entry.kind === 'Actor' && entry.resources.length > 0) {
-                <span class="text-[9px] text-slate-500">· {{ entry.resources.length }} resource(s)</span>
+                <span class="text-[11px] text-slate-500">· {{ entry.resources.length }} resource(s)</span>
               }
             </button>
             <button
               type="button"
-              class="shrink-0 rounded px-1 text-[10px] text-rose-400 transition hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+              class="shrink-0 rounded px-1 text-[12px] text-rose-400 transition hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
               [attr.aria-label]="'Delete ' + entry.name"
               (click)="remove(entry)"
             >
@@ -184,13 +184,13 @@
                     (input)="patch(entry, { name: $any($event.target).value })"
                   />
                   <div class="flex items-center gap-2">
-                    <label class="text-[10px] uppercase tracking-wider text-slate-500" [attr.for]="'tpl-cat-' + entry.id">
+                    <label class="text-[12px] uppercase tracking-wider text-slate-500" [attr.for]="'tpl-cat-' + entry.id">
                       {{ categoryLabel(entry.kind) }}
                     </label>
                     @if (categoryOptions(entry.kind).length > 0) {
                       <select
                         [id]="'tpl-cat-' + entry.id"
-                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
                         [value]="entry.category"
                         (change)="patch(entry, { category: $any($event.target).value })"
                       >
@@ -202,7 +202,7 @@
                       <input
                         [id]="'tpl-cat-' + entry.id"
                         type="text"
-                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                        class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
                         [value]="entry.category"
                         (input)="patch(entry, { category: $any($event.target).value })"
                       />
@@ -216,7 +216,7 @@
                 [id]="'tpl-desc-' + entry.id"
                 rows="3"
                 placeholder="Description / content"
-                class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
                 [value]="entry.description"
                 (input)="patch(entry, { description: $any($event.target).value })"
               ></textarea>
@@ -224,39 +224,39 @@
               @if (entry.kind === 'Actor') {
                 <div class="rounded border border-slate-700 bg-slate-950 p-1.5">
                   <div class="mb-1 flex items-center justify-between">
-                    <span class="text-[10px] uppercase tracking-wider text-slate-500">Default resources</span>
+                    <span class="text-[12px] uppercase tracking-wider text-slate-500">Default resources</span>
                     <button
                       type="button"
-                      class="text-[10px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                      class="text-[12px] text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                       (click)="addResource(entry)"
                     >
                       + Resource
                     </button>
                   </div>
                   @if (entry.resources.length === 0) {
-                    <p class="text-[10px] italic text-slate-600">No resources.</p>
+                    <p class="text-[12px] italic text-slate-600">No resources.</p>
                   } @else {
                     <ul class="space-y-1">
                       @for (resource of entry.resources; track $index) {
                         <li class="flex items-center gap-1.5">
                           <input
                             type="text"
-                            class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            class="min-w-0 flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
                             [value]="resource.nome"
                             (input)="updateResource(entry, $index, { nome: $any($event.target).value })"
                           />
                           <input
                             type="number"
                             min="0"
-                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
                             [value]="resource.currentValue"
                             (input)="updateResource(entry, $index, { currentValue: +$any($event.target).value })"
                           />
-                          <span class="text-[10px] text-slate-600">/</span>
+                          <span class="text-[12px] text-slate-600">/</span>
                           <input
                             type="number"
                             min="0"
-                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+                            class="w-14 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
                             [value]="resource.maxValue"
                             (input)="updateResource(entry, $index, { maxValue: +$any($event.target).value })"
                           />
@@ -268,7 +268,7 @@
                           />
                           <button
                             type="button"
-                            class="rounded px-1 text-[10px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                            class="rounded px-1 text-[12px] text-slate-500 transition hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                             aria-label="Remove resource"
                             (click)="removeResource(entry, $index)"
                           >
@@ -284,14 +284,14 @@
               <div class="flex justify-end gap-1.5">
                 <button
                   type="button"
-                  class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                  class="rounded border border-slate-700 px-2 py-1 text-[13px] text-slate-400 transition hover:border-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   (click)="toggle(entry)"
                 >
                   Close
                 </button>
                 <button
                   type="button"
-                  class="rounded bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
+                  class="rounded bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
                   [disabled]="busy()"
                   (click)="save(entry)"
                 >

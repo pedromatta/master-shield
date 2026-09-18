@@ -28,7 +28,7 @@
 
   @if (needsAccount()) {
     <fieldset class="mb-4 rounded border border-slate-700 p-3">
-      <legend class="px-1 text-[10px] uppercase tracking-wider text-slate-500">
+      <legend class="px-1 text-[12px] uppercase tracking-wider text-slate-500">
         Owner account
       </legend>
 
@@ -36,7 +36,7 @@
         <div class="col-span-1">
           <label
             for="owner-username"
-            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+            class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
           >
             Username <span aria-hidden="true" class="text-rose-400">*</span>
           </label>
@@ -54,7 +54,7 @@
         <div class="col-span-1">
           <label
             for="owner-email"
-            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+            class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
           >
             Email
           </label>
@@ -71,7 +71,7 @@
         <div class="col-span-2">
           <label
             for="owner-password"
-            class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+            class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
           >
             Password <span aria-hidden="true" class="text-rose-400">*</span>
           </label>
@@ -84,7 +84,7 @@
             [value]="ownerPassword()"
             (input)="ownerPassword.set($any($event.target).value)"
           />
-          <p class="mt-1 text-[10px] text-slate-500">
+          <p class="mt-1 text-[12px] text-slate-500">
             Stored hashed. There is no sign-in yet — this only identifies the campaign owner.
           </p>
         </div>
@@ -96,7 +96,7 @@
     <div>
       <label
         for="campaign-name"
-        class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+        class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
       >
         Campaign name <span aria-hidden="true" class="text-rose-400">*</span>
       </label>
@@ -115,7 +115,7 @@
     <div>
       <label
         for="campaign-system"
-        class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+        class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
       >
         Game system
       </label>
@@ -142,7 +142,7 @@
       </div>
 
       @if (gameSystemId()) {
-        <label class="mt-1.5 flex cursor-pointer items-center gap-1.5 text-[11px] text-slate-400">
+        <label class="mt-1.5 flex cursor-pointer items-center gap-1.5 text-[13px] text-slate-400">
           <input
             type="checkbox"
             class="size-3 accent-sky-500"
@@ -158,7 +158,7 @@
           <div class="min-w-0 flex-1">
             <label
               for="new-system-name"
-              class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+              class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
             >
               System name
             </label>
@@ -174,7 +174,7 @@
           <div class="w-20">
             <label
               for="new-system-version"
-              class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500"
+              class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500"
             >
               Version
             </label>
