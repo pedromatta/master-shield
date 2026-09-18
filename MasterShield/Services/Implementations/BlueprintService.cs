@@ -138,6 +138,15 @@ public class BlueprintService : IBlueprintService
 
         ApplyAttributesTo(actor.SystemData, blueprint);
 
+        // The blueprint decides which attributes the actor's Overview shows by default.
+        if (actor.OverviewFields.Count == 0)
+        {
+            actor.OverviewFields = blueprint.Attributes
+                .Where(a => a.ShowInOverview && !string.IsNullOrWhiteSpace(a.Key))
+                .Select(a => a.Key)
+                .ToList();
+        }
+
         var existing = actor.Resources
             .Select(r => r.Nome)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);

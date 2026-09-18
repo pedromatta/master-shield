@@ -76,6 +76,15 @@ public class MasterShieldContext : IdentityDbContext<User, IdentityRole<Guid>, G
             c => c == null ? 0 : JsonSerializer.Serialize(c, JsonOptions).GetHashCode(),
             c => c == null ? new List<Guid>() : DeserializeGuidList(JsonSerializer.Serialize(c, JsonOptions)));
 
+        var stringListConverter = new ValueConverter<List<string>, string>(
+            value => JsonSerializer.Serialize(value, JsonOptions),
+            json => DeserializeStringList(json));
+
+        var stringListComparer = new ValueComparer<List<string>>(
+            (c1, c2) => JsonSerializer.Serialize(c1, JsonOptions) == JsonSerializer.Serialize(c2, JsonOptions),
+            c => c == null ? 0 : JsonSerializer.Serialize(c, JsonOptions).GetHashCode(),
+            c => c == null ? new List<string>() : DeserializeStringList(JsonSerializer.Serialize(c, JsonOptions)));
+
         modelBuilder.Entity<Actor>()
             .Property(a => a.SystemData)
             .HasConversion(jsonPayload)
@@ -173,6 +182,12 @@ public class MasterShieldContext : IdentityDbContext<User, IdentityRole<Guid>, G
             .HasConversion(guidListConverter)
             .HasColumnType("jsonb")
             .Metadata.SetValueComparer(guidListComparer);
+
+        modelBuilder.Entity<Actor>()
+            .Property(a => a.OverviewFields)
+            .HasConversion(stringListConverter)
+            .HasColumnType("jsonb")
+            .Metadata.SetValueComparer(stringListComparer);
 
         modelBuilder.Entity<EncounterParticipant>()
             .Property(p => p.ResourceOverrides)
@@ -349,6 +364,9 @@ public class MasterShieldContext : IdentityDbContext<User, IdentityRole<Guid>, G
 
     private static List<Guid> DeserializeGuidList(string json) =>
         TryDeserialize<List<Guid>>(json) ?? new List<Guid>();
+
+    private static List<string> DeserializeStringList(string json) =>
+        TryDeserialize<List<string>>(json) ?? new List<string>();
     /// <summary>
     /// Deserialises a JSON column value, returning <c>null</c> for empty or malformed data so
     /// legacy rows (for example a migration default of "") never fault a read.

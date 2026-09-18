@@ -28,6 +28,12 @@ public class Actor
     /// </summary>
     public List<Guid> EncounterResourceIds { get; set; } = new();
 
+    /// <summary>
+    /// System-data keys the GM pinned to the actor's Overview tab. Mirrors the game system's
+    /// blueprint hints, which pre-select a sensible default set when the actor is created.
+    /// </summary>
+    public List<string> OverviewFields { get; set; } = new();
+
     [JsonIgnore]
     public Campaign Campaign { get; set; } = null!;
     public ICollection<Resource> Resources { get; set; } = new List<Resource>();

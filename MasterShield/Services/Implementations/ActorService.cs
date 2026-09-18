@@ -69,6 +69,7 @@ public class ActorService : MasterShieldContextService, IActorService
         existing.IconId = actor.IconId;
         existing.SystemData = actor.SystemData;
         existing.EncounterResourceIds = actor.EncounterResourceIds ?? [];
+        existing.OverviewFields = actor.OverviewFields ?? [];
 
         var tags = await ResolveTagsAsync(actor.Tags.Select(t => t.Id), TagCategory.Actor);
         existing.Tags.Clear();
