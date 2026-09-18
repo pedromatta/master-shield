@@ -63,6 +63,17 @@ public class UserService : IUserService
         return await _userManager.GeneratePasswordResetTokenAsync(user);
     }
 
+    public async Task<string?> GetResetEmailAsync(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return null;
+
+        var user = await _userManager.FindByNameAsync(username.Trim());
+        // No address on file means no way to deliver the link; treat it like a miss so the
+        // caller never learns whether the username exists.
+        return string.IsNullOrWhiteSpace(user?.Email) ? null : user!.Email;
+    }
+
     public async Task<UserResult> ResetPasswordAsync(string username, string token, string newPassword)
     {
         if (string.IsNullOrWhiteSpace(newPassword))

@@ -40,11 +40,16 @@ public interface IUserService
     Task<UserResult> SignUpAsync(string username, string? email, string password, string? displayName);
 
     /// <summary>
-    /// Issues a password-reset token for an account. There is no mail delivery in this local
-    /// tool, so the token is returned to the caller, which shows it to the GM to hand over.
-    /// Returns <c>null</c> when the account does not exist.
+    /// Issues a password-reset token for an account. Returns <c>null</c> when the account
+    /// does not exist.
     /// </summary>
     Task<string?> CreatePasswordResetTokenAsync(string username);
+
+    /// <summary>
+    /// Returns the email address a reset link should be sent to, or <c>null</c> when the
+    /// username is unknown or the account has no address on file.
+    /// </summary>
+    Task<string?> GetResetEmailAsync(string username);
 
     /// <summary>Completes a reset with the token issued by <see cref="CreatePasswordResetTokenAsync"/>.</summary>
     Task<UserResult> ResetPasswordAsync(string username, string token, string newPassword);

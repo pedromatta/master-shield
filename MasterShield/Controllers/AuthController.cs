@@ -18,10 +18,20 @@ namespace MasterShield.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IUserService _users;
+    private readonly IEmailSender _email;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IUserService users)
+    public AuthController(
+        IUserService users,
+        IEmailSender email,
+        IConfiguration configuration,
+        ILogger<AuthController> logger)
     {
         _users = users;
+        _email = email;
+        _configuration = configuration;
+        _logger = logger;
     }
 
     /// <summary>Signs an account in and issues the auth cookie.</summary>
@@ -65,18 +75,47 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Starts a password reset. This install has no mail delivery, so the reset token is
-    /// returned directly for the GM to hand to the account owner.
+    /// Starts a password reset. The reset link is emailed to the address on the account; the
+    /// response never reveals whether the username exists and never contains the token.
     /// </summary>
     [HttpPost("forgot-password")]
-    public async Task<ActionResult<PasswordResetTicket>> ForgotPassword(
-        [FromBody] ForgotPasswordRequest request)
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
+        // Always answer the same way so the endpoint cannot be used to probe usernames.
+        var email = await _users.GetResetEmailAsync(request.Username);
+        if (email is null)
+            return Ok();
+
         var token = await _users.CreatePasswordResetTokenAsync(request.Username);
         if (token is null)
-            return NotFound("No account with that username.");
+            return Ok();
 
-        return Ok(new PasswordResetTicket(request.Username.Trim(), token));
+        var link = BuildResetLink(request.Username.Trim(), token);
+        var body =
+            $"A password reset was requested for your Master Shield account.\n\n" +
+            $"Open this link to choose a new password:\n{link}\n\n" +
+            "If you did not request this, you can ignore this message.";
+
+        try
+        {
+            await _email.SendAsync(email, "Master Shield password reset", body);
+        }
+        catch (Exception ex)
+        {
+            // Do not surface delivery problems to the caller; log them for the operator.
+            _logger.LogError(ex, "Could not send the password reset email.");
+        }
+
+        return Ok();
+    }
+
+    /// <summary>Builds the absolute link the GM follows to set a new password.</summary>
+    private string BuildResetLink(string username, string token)
+    {
+        var baseUrl = (_configuration["App:PublicUrl"] ?? "http://localhost:4200").TrimEnd('/');
+        var query =
+            $"?username={Uri.EscapeDataString(username)}&token={Uri.EscapeDataString(token)}";
+        return $"{baseUrl}/reset-password{query}";
     }
 
     /// <summary>Completes a password reset with a previously issued token.</summary>
@@ -173,9 +212,6 @@ public class AuthController : ControllerBase
     public record ForgotPasswordRequest(string Username);
 
     public record ResetPasswordRequest(string Username, string Token, string NewPassword);
-
-    /// <summary>The reset token issued for a username, surfaced directly to the caller.</summary>
-    public record PasswordResetTicket(string Username, string Token);
 
     /// <summary>Theme overrides; a null field leaves the current value untouched.</summary>
     public record ThemeRequest(
