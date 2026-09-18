@@ -14,10 +14,22 @@ public class CampaignService : ICampaignService
         _context = context;
     }
 
-    public async Task<IEnumerable<Campaign>> GetAllAsync() =>
-        await _context.Campaigns.AsNoTracking().ToListAsync();
+    public async Task<IEnumerable<Campaign>> GetByUserAsync(Guid userId) =>
+        await _context.Campaigns
+            .AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .OrderBy(c => c.Name)
+            .ToListAsync();
 
-    public async Task<Campaign?> GetByIdAsync(Guid id) =>
+    public async Task<Campaign?> GetByIdAsync(Guid id, Guid userId) =>
+        await _context.Campaigns
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+
+    public async Task<bool> IsOwnedByAsync(Guid campaignId, Guid userId) =>
+        await _context.Campaigns.AnyAsync(c => c.Id == campaignId && c.UserId == userId);
+
+    public async Task<Campaign?> GetForMapAsync(Guid id) =>
         await _context.Campaigns.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
     public async Task<Campaign> CreateAsync(Campaign campaign)
@@ -52,9 +64,10 @@ public class CampaignService : ICampaignService
         return campaign;
     }
 
-    public async Task<bool> UpdateAsync(Campaign campaign)
+    public async Task<bool> UpdateAsync(Campaign campaign, Guid userId)
     {
-        var existing = await _context.Campaigns.FirstOrDefaultAsync(c => c.Id == campaign.Id);
+        var existing = await _context.Campaigns
+            .FirstOrDefaultAsync(c => c.Id == campaign.Id && c.UserId == userId);
         if (existing is null)
             return false;
 
@@ -66,9 +79,10 @@ public class CampaignService : ICampaignService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id, Guid userId)
     {
-        var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.Id == id);
+        var campaign = await _context.Campaigns
+            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
         if (campaign is null)
             return false;
 
@@ -77,9 +91,10 @@ public class CampaignService : ICampaignService
         return true;
     }
 
-    public async Task<bool> SetCurrentMapAsync(Guid campaignId, Guid? locationId)
+    public async Task<bool> SetCurrentMapAsync(Guid campaignId, Guid? locationId, Guid userId)
     {
-        var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.Id == campaignId);
+        var campaign = await _context.Campaigns
+            .FirstOrDefaultAsync(c => c.Id == campaignId && c.UserId == userId);
         if (campaign is null)
             return false;
 

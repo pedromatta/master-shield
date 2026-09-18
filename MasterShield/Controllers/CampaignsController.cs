@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using MasterShield.Filters;
 using MasterShield.Models;
 using MasterShield.Services.Implementations;
 using MasterShield.Services.Interfaces;
@@ -26,25 +28,37 @@ public class CampaignsController : ControllerBase
         _httpClientFactory = httpClientFactory;
     }
 
+    /// <summary>The signed-in GM's campaigns only.</summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Campaign>>> GetAll()
     {
-        var campaigns = await _campaignService.GetAllAsync();
-        return Ok(campaigns);
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        return Ok(await _campaignService.GetByUserAsync(userId.Value));
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Campaign>> GetById(Guid id)
     {
-        var campaign = await _campaignService.GetByIdAsync(id);
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var campaign = await _campaignService.GetByIdAsync(id, userId.Value);
         return campaign is null ? NotFound() : Ok(campaign);
     }
 
     [HttpPost]
     public async Task<ActionResult<Campaign>> Create([FromBody] Campaign campaign)
     {
-        if (string.IsNullOrWhiteSpace(campaign.Name) || campaign.UserId == Guid.Empty)
-            return BadRequest("Name and UserId are required.");
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        if (string.IsNullOrWhiteSpace(campaign.Name))
+            return BadRequest("Name is required.");
+
+        // Ownership always comes from the session, never from the request body.
+        campaign.UserId = userId.Value;
 
         var created = await _campaignService.CreateAsync(campaign);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -53,22 +67,40 @@ public class CampaignsController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] Campaign campaign)
     {
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
         if (id != campaign.Id)
             return BadRequest("Route id does not match payload id.");
 
-        return await _campaignService.UpdateAsync(campaign) ? NoContent() : NotFound();
+        return await _campaignService.UpdateAsync(campaign, userId.Value) ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id) =>
-        await _campaignService.DeleteAsync(id) ? NoContent() : NotFound();
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        return await _campaignService.DeleteAsync(id, userId.Value) ? NoContent() : NotFound();
+    }
 
     /// <summary>Points the campaign's stable map URI at a location, or clears it.</summary>
     [HttpPut("{id:guid}/current-map")]
     public async Task<IActionResult> SetCurrentMap(Guid id, [FromQuery] Guid? locationId)
     {
-        var updated = await _campaignService.SetCurrentMapAsync(id, locationId);
+        var userId = CurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var updated = await _campaignService.SetCurrentMapAsync(id, locationId, userId.Value);
         return updated ? NoContent() : NotFound();
+    }
+
+    /// <summary>The signed-in user's id, or null when the request is anonymous.</summary>
+    private Guid? CurrentUserId()
+    {
+        var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(raw, out var id) ? id : null;
     }
 
     /// <summary>
@@ -80,6 +112,7 @@ public class CampaignsController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}/map")]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [AllowAnonymousCampaign]
     public Task<IActionResult> GetCurrentMap(Guid id) => StreamCurrentMapAsync(id);
 
     /// <summary>
@@ -88,11 +121,12 @@ public class CampaignsController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}/map/image")]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [AllowAnonymousCampaign]
     public Task<IActionResult> GetCurrentMapImage(Guid id) => StreamCurrentMapAsync(id);
 
     private async Task<IActionResult> StreamCurrentMapAsync(Guid id)
     {
-        var campaign = await _campaignService.GetByIdAsync(id);
+        var campaign = await _campaignService.GetForMapAsync(id);
         if (campaign is null)
             return NotFound();
 
