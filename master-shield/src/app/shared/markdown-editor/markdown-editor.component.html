@@ -1,0 +1,30 @@
+<div class="flex min-h-0 flex-col" [attr.aria-label]="label()">
+  <div class="mb-1 flex flex-wrap items-center gap-1">
+    <span class="mr-auto text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+      {{ label() }}
+    </span>
+
+    @if (editable()) {
+      <div class="flex flex-wrap items-center gap-0.5">
+        <button type="button" class="rt-btn font-bold" title="Bold" aria-label="Bold" (click)="apply('bold')">B</button>
+        <button type="button" class="rt-btn italic" title="Italic" aria-label="Italic" (click)="apply('italic')">I</button>
+        <button type="button" class="rt-btn underline" title="Underline" aria-label="Underline" (click)="apply('underline')">U</button>
+        <button type="button" class="rt-btn" title="Heading" aria-label="Heading" (click)="formatBlock('H3')">H</button>
+        <button type="button" class="rt-btn" title="Bulleted list" aria-label="Bulleted list" (click)="apply('insertUnorderedList')">•</button>
+        <button type="button" class="rt-btn" title="Numbered list" aria-label="Numbered list" (click)="apply('insertOrderedList')">1.</button>
+        <button type="button" class="rt-btn" title="Quote" aria-label="Quote" (click)="formatBlock('BLOCKQUOTE')">❝</button>
+        <button type="button" class="rt-btn" title="Clear formatting" aria-label="Clear formatting" (click)="apply('removeFormat')">⌫</button>
+      </div>
+    }
+  </div>
+
+  <div
+    #editor
+    class="markdown-body min-h-[6rem] w-full flex-1 overflow-auto rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm leading-relaxed text-slate-200 focus:border-sky-500 focus:outline-none"
+    [attr.data-placeholder]="placeholder()"
+    [attr.contenteditable]="editable()"
+    [attr.rows]="rows()"
+    [attr.aria-label]="label()"
+    (input)="onInput()"
+  ></div>
+</div>
