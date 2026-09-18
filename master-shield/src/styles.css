@@ -133,10 +133,14 @@
   /* Named layers so the whole app can be re-skinned without touching
    * component markup. Surfaces are deliberately opaque: flat, solid blocks
    * read as carved boards rather than translucent "glass" panels. */
-  --color-surface-base: var(--color-slate-950); /* app backdrop */
-  --color-surface-panel: var(--color-slate-900); /* windows, boards, side rails */
-  --color-surface-inset: #1c160d; /* wells set into a panel */
-  --color-surface-raised: var(--color-slate-800); /* controls, rows, headers */
+  --color-surface-base: var(--color-slate-950);
+  /* app backdrop */
+  --color-surface-panel: var(--color-slate-900);
+  /* windows, boards, side rails */
+  --color-surface-inset: #1c160d;
+  /* wells set into a panel */
+  --color-surface-raised: var(--color-slate-800);
+  /* controls, rows, headers */
 
   /* Micro-labels: less aggressive tracking than the default reads as engraved
    * small-caps rather than a technical HUD. */
