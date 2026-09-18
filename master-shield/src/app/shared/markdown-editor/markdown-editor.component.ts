@@ -5,6 +5,7 @@ import {
   effect,
   input,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -16,9 +17,10 @@ import { IconComponent } from '../icon/icon.component';
  * Lightweight rich-text field. The GM applies simple styling (bold, italic, headings,
  * lists, quotes) with a small toolbar; the stored value is sanitised HTML.
  *
- * The editor is uncontrolled while focused: the DOM is only re-synced from the model when
- * the incoming value differs from what the user has typed. That avoids the caret jumping to
- * the end (or character loss) when a parent echoes the value back while typing.
+ * Editing is buffered: the component emits `valueChange` only when the field loses focus
+ * (or the user presses the save shortcut), never per keystroke, so hosts do not fire a
+ * request on every character. The DOM is re-synced from the model only when the field is
+ * not focused, so the caret never jumps while typing.
  */
 @Component({
   selector: 'app-markdown-editor',
@@ -37,26 +39,43 @@ export class MarkdownEditorComponent {
 
   private readonly host = viewChild.required<ElementRef<HTMLElement>>('editor');
 
+  /** True while the field has focus; used to avoid clobbering the caret. */
+  protected readonly focused = signal(false);
+
   /** The last value this component emitted, so we can ignore our own echo. */
   private lastEmitted = '';
 
   constructor() {
-    // Push the model into the DOM only when it changed from outside (not our own echo) and
-    // the field is not being typed into.
     effect(() => {
       const incoming = this.value() ?? '';
       const element = this.host().nativeElement;
+
+      // Never rewrite the DOM while the user is typing into it.
+      if (this.focused()) return;
       if (incoming === this.lastEmitted) return;
+
       if (element.innerHTML !== incoming) {
         element.innerHTML = DOMPurify.sanitize(incoming);
       }
     });
   }
 
-  protected onInput(): void {
-    const html = this.host().nativeElement.innerHTML;
-    this.lastEmitted = html;
-    this.valueChange.emit(html);
+  protected onFocus(): void {
+    this.focused.set(true);
+  }
+
+  /** Commits the buffered HTML on blur — the single point where hosts persist. */
+  protected onBlur(): void {
+    this.focused.set(false);
+    this.commit();
+  }
+
+  protected onKeydown(event: KeyboardEvent): void {
+    // Ctrl/Cmd+S saves without leaving the field.
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      this.commit();
+    }
   }
 
   /** Applies a simple inline/block command via the browser's own editing actions. */
@@ -66,14 +85,17 @@ export class MarkdownEditorComponent {
     // execCommand is deprecated but remains the only cross-browser zero-dependency way to
     // apply inline formatting inside a contenteditable without a full editor framework.
     document.execCommand(command, false, argument);
-    this.onInput();
   }
 
   protected formatBlock(tag: string): void {
     this.apply('formatBlock', tag);
   }
 
-  protected isBlank(): boolean {
-    return !(this.value() ?? '').trim() || (this.value() ?? '').trim() === '<br>';
+  private commit(): void {
+    const html = this.host().nativeElement.innerHTML;
+    if (html === this.lastEmitted) return;
+
+    this.lastEmitted = html;
+    this.valueChange.emit(html);
   }
 }
