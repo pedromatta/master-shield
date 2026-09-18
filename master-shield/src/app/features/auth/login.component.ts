@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { IconComponent } from '../../shared/icon/icon.component';
 
-type Mode = 'signin' | 'signup' | 'forgot' | 'reset';
+type Mode = 'signin' | 'signup' | 'forgot';
 
 /**
  * Authentication screen. Covers sign-in, sign-up and the two-step password reset
@@ -30,9 +30,6 @@ export class LoginComponent {
   protected readonly confirm = signal('');
   protected readonly email = signal('');
 
-  /** Token returned by the reset request, shown for the GM to copy into the reset form. */
-  protected readonly resetToken = signal('');
-
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly status = signal<string | null>(null);
@@ -56,15 +53,6 @@ export class LoginComponent {
     );
   }
 
-  protected canReset(): boolean {
-    return (
-      this.username().trim().length > 0 &&
-      this.resetToken().trim().length > 0 &&
-      this.password().length >= 6 &&
-      this.password() === this.confirm() &&
-      !this.busy()
-    );
-  }
 
   protected async signIn(): Promise<void> {
     if (!this.canSignIn()) return;
@@ -101,7 +89,7 @@ export class LoginComponent {
     }
   }
 
-  /** Requests a reset token for the entered username. */
+  /** Asks the API to email a reset link. The response is intentionally neutral. */
   protected async requestReset(): Promise<void> {
     const username = this.username().trim();
     if (!username || this.busy()) return;
@@ -110,32 +98,13 @@ export class LoginComponent {
     this.error.set(null);
     this.status.set(null);
     try {
-      const ticket = await this.auth.forgotPassword(username);
-      // Surfaced directly: this install has no mail delivery.
-      this.resetToken.set(ticket.token);
-      this.status.set('Reset token issued. Paste it below with a new password.');
-      this.mode.set('reset');
-    } catch {
-      this.error.set('No account with that username.');
-    } finally {
-      this.busy.set(false);
-    }
-  }
-
-  protected async submitReset(): Promise<void> {
-    if (!this.canReset()) return;
-
-    this.busy.set(true);
-    this.error.set(null);
-    try {
-      await this.auth.resetPassword(this.username().trim(), this.resetToken().trim(), this.password());
-      this.status.set('Password updated. You can sign in now.');
-      this.password.set('');
-      this.confirm.set('');
-      this.resetToken.set('');
+      await this.auth.forgotPassword(username);
+      this.status.set(
+        'If that account exists and has an email address, a reset link is on its way.',
+      );
       this.mode.set('signin');
-    } catch (error) {
-      this.error.set(extractError(error) ?? 'That reset token is not valid.');
+    } catch {
+      this.error.set('Could not start the reset. Try again later.');
     } finally {
       this.busy.set(false);
     }

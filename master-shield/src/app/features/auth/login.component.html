@@ -16,9 +16,6 @@
           @case ('forgot') {
             Recover your password.
           }
-          @case ('reset') {
-            Choose a new password.
-          }
           @default {
             Sign in to your table.
           }
@@ -163,7 +160,7 @@
     @if (mode() === 'forgot') {
       <form (ngSubmit)="requestReset()" class="space-y-3">
         <p class="text-[13px] text-slate-400">
-          Enter your username and a reset token will be issued for you to set a new password.
+          Enter your username and we will email a reset link to the address on the account.
         </p>
         <div>
           <label for="forgot-username" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
@@ -183,7 +180,7 @@
           class="w-full rounded border border-sky-700 bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
           [disabled]="!username().trim() || busy()"
         >
-          {{ busy() ? 'Working…' : 'Request reset token' }}
+          {{ busy() ? 'Working…' : 'Send reset link' }}
         </button>
       </form>
 
@@ -194,63 +191,5 @@
       </div>
     }
 
-    <!-- Reset password -->
-    @if (mode() === 'reset') {
-      <form (ngSubmit)="submitReset()" class="space-y-3">
-        @if (resetToken()) {
-          <div>
-            <label for="reset-token" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
-              Reset token
-            </label>
-            <textarea
-              id="reset-token"
-              rows="3"
-              class="w-full resize-none rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-[12px] break-all text-slate-300 focus:border-sky-500 focus:outline-none"
-              [value]="resetToken()"
-              (input)="resetToken.set($any($event.target).value)"
-            ></textarea>
-          </div>
-        }
-        <div>
-          <label for="reset-password" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
-            New password
-          </label>
-          <input
-            id="reset-password"
-            type="password"
-            autocomplete="new-password"
-            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
-            [value]="password()"
-            (input)="password.set($any($event.target).value)"
-          />
-        </div>
-        <div>
-          <label for="reset-confirm" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
-            Confirm password
-          </label>
-          <input
-            id="reset-confirm"
-            type="password"
-            autocomplete="new-password"
-            class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
-            [value]="confirm()"
-            (input)="confirm.set($any($event.target).value)"
-          />
-        </div>
-        <button
-          type="submit"
-          class="w-full rounded border border-sky-700 bg-sky-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-40"
-          [disabled]="!canReset()"
-        >
-          {{ busy() ? 'Saving…' : 'Set new password' }}
-        </button>
-      </form>
-
-      <div class="mt-4 text-center text-[13px]">
-        <button type="button" class="text-sky-400 transition hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500" (click)="setMode('signin')">
-          Back to sign in
-        </button>
-      </div>
-    }
   </section>
 </div>

@@ -79,12 +79,10 @@ export class AuthService {
     return user;
   }
 
-  /** Requests a reset token for a username (returned directly; no mail is sent). */
-  forgotPassword(username: string): Promise<{ username: string; token: string }> {
+  /** Asks the API to email a reset link. Resolves regardless of whether the account exists. */
+  forgotPassword(username: string): Promise<void> {
     return firstValueFrom(
-      this.http.post<{ username: string; token: string }>(`${this.base}/forgot-password`, {
-        username,
-      }),
+      this.http.post<void>(`${this.base}/forgot-password`, { username }),
     );
   }
 

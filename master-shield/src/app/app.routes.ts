@@ -9,6 +9,12 @@ export const routes: Routes = [
     title: 'Sign in · Master Shield',
   },
   {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password.component').then((m) => m.ResetPasswordComponent),
+    title: 'Reset password · Master Shield',
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
