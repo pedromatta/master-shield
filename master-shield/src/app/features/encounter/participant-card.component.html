@@ -40,6 +40,15 @@
 
     <div class="min-w-0 flex-1">
       <div class="flex items-center gap-1.5">
+        <button
+          type="button"
+          class="grid size-5 shrink-0 place-items-center rounded text-slate-500 transition hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          [attr.aria-expanded]="!collapsed()"
+          [attr.aria-label]="(collapsed() ? 'Expand ' : 'Collapse ') + (a?.name ?? 'participant')"
+          (click)="toggleCollapsed()"
+        >
+          <app-icon [name]="collapsed() ? 'lu:chevron-right' : 'lu:chevron-down'" [size]="12" />
+        </button>
         <h4 class="min-w-0 flex-1 truncate text-sm font-semibold text-slate-100">
           {{ a?.name ?? 'Unknown actor' }}
         </h4>
@@ -56,6 +65,7 @@
         }
       </div>
 
+      @if (!collapsed()) {
       <p class="mt-0.5 flex items-center gap-2 text-[13px] text-slate-400">
         <span class="text-slate-600">{{ effectCount() }} effect(s)</span>
         <span class="ml-auto text-slate-600">init {{ p.initiative }}</span>
@@ -123,6 +133,7 @@
         [effects]="p.temporaryEffects"
         (effectsChange)="onEffectsChange($event)"
       />
+      }
     </div>
   </div>
 </article>

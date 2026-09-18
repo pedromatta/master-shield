@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { EncounterParticipant } from '../../core/models/encounter.model';
 import { Actor, Resource } from '../../core/models/actor.model';
@@ -46,6 +46,13 @@ export class ParticipantCardComponent {
   protected readonly effectCount = computed(
     () => Object.keys(this.participant().temporaryEffects ?? {}).length,
   );
+
+  /** Collapsed rows show only the portrait and name. */
+  protected readonly collapsed = signal(false);
+
+  protected toggleCollapsed(): void {
+    this.collapsed.update((value) => !value);
+  }
 
   protected readonly portraitUri = computed(() => assetUrl(this.actor()?.imageUri));
 
