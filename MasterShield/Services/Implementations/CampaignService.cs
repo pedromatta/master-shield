@@ -26,6 +26,28 @@ public class CampaignService : ICampaignService
             campaign.Id = Guid.NewGuid();
 
         _context.Campaigns.Add(campaign);
+
+        // A campaign always starts with a session and an encounter, so the GM is never
+        // left without a place to work. Both are named by their indexer.
+        var session = new Session
+        {
+            Id = Guid.NewGuid(),
+            CampaignId = campaign.Id,
+            SessionNumber = 1,
+            Title = "Session",
+            DatePlayed = DateTime.UtcNow
+        };
+        _context.Sessions.Add(session);
+
+        _context.Encounters.Add(new Encounter
+        {
+            Id = Guid.NewGuid(),
+            SessionId = session.Id,
+            Name = "Encounter",
+            IsActive = true,
+            CurrentRound = 1
+        });
+
         await _context.SaveChangesAsync();
         return campaign;
     }
