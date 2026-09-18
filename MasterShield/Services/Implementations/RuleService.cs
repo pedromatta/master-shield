@@ -53,6 +53,7 @@ public class RuleService : MasterShieldContextService, IRuleService
 
         existing.Name = category.Name;
         existing.Icon = category.Icon;
+        existing.IconId = category.IconId;
         existing.IconUri = category.IconUri;
         existing.SortOrder = category.SortOrder;
         existing.ShowInToolbar = category.ShowInToolbar;
