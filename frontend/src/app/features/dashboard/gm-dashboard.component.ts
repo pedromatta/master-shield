@@ -43,8 +43,10 @@ export class GmDashboardComponent {
 
   /** Signs the GM out and returns to the login screen. */
   protected async logout(): Promise<void> {
-    await this.auth.logout();
-    await this.router.navigate(['/login']);
+    if (window.confirm("Are you sure you want to log out?")) {
+      await this.auth.logout();
+      await this.router.navigate(['/login']);
+    }
   }
 
   protected readonly showNewCampaign = signal(false);

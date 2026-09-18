@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay'
 import { ALL_ICONS, IconOption } from './icon-catalog';
 import { IconComponent } from './icon.component';
-import { ImageUploadComponent } from '../image-upload/image-upload.component';
 
 /**
  * Icon chooser for actors, rules, categories and locations. Offers the RPG Awesome and
@@ -21,7 +20,7 @@ import { ImageUploadComponent } from '../image-upload/image-upload.component';
  */
 @Component({
   selector: 'app-icon-picker',
-  imports: [FormsModule, IconComponent, ImageUploadComponent, OverlayModule],
+  imports: [FormsModule, IconComponent, OverlayModule],
   templateUrl: './icon-picker.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

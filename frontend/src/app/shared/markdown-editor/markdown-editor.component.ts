@@ -11,7 +11,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import DOMPurify from 'dompurify';
 
-import { IconComponent } from '../icon/icon.component';
 
 /**
  * Lightweight rich-text field. The GM applies simple styling (bold, italic, headings,
@@ -24,7 +23,7 @@ import { IconComponent } from '../icon/icon.component';
  */
 @Component({
   selector: 'app-markdown-editor',
-  imports: [FormsModule, IconComponent],
+  imports: [FormsModule],
   templateUrl: './markdown-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -12,11 +12,26 @@ export interface AuthUser {
   displayName: string;
   /** Personal theme overrides (null when the built-in default applies). */
   themeAccent: string | null;
+  themeSecondary: string | null;
   themeDanger: string | null;
   themeSuccess: string | null;
+  themeSurfaceBase: string | null;
+  themeSurfacePanel: string | null;
+  themeSurfaceRaised: string | null;
+  themeSurfaceInset: string | null;
+  themeTextMain: string | null;
+  themeTextMuted: string | null;
+  themeBorderColor: string | null;
   themeFontBody: string | null;
   themeFontDisplay: string | null;
   themeBackgroundUri: string | null;
+  themeBackgroundOpacity: string | null;
+  themeBackgroundBlur: string | null;
+  themeBackgroundFit: string | null;
+  themeBackgroundPosition: string | null;
+  themeBackgroundRepeat: string | null;
+  themeWindowOpacity: string | null;
+  themeChromeOpacity: string | null;
 }
 
 /**

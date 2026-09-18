@@ -150,40 +150,73 @@
   /* ---- Type scale -------------------------------------------------------- */
   /* Readability first: the dense GM layout still fits, but every step is a
    * notch larger than Tailwind's default so small labels stay legible. */
-  --text-xs: 0.8125rem; /* 13px */
+  --text-xs: 0.8125rem;
+  /* 13px */
   --text-xs--line-height: 1.15rem;
-  --text-sm: 0.9375rem; /* 15px */
+  --text-sm: 0.9375rem;
+  /* 15px */
   --text-sm--line-height: 1.35rem;
-  --text-base: 1.0625rem; /* 17px */
+  --text-base: 1.0625rem;
+  /* 17px */
   --text-base--line-height: 1.6rem;
-  --text-lg: 1.1875rem; /* 19px */
+  --text-lg: 1.1875rem;
+  /* 19px */
   --text-lg--line-height: 1.75rem;
-  --text-xl: 1.375rem; /* 22px */
+  --text-xl: 1.375rem;
+  /* 22px */
   --text-xl--line-height: 1.9rem;
 }
 
 /* ---- Base ---------------------------------------------------------------- */
 
+html {
+  font-size: calc(100% * var(--ui-font-scale, 1));
+}
+
 html,
 body {
   height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
+  position: relative;
   background-color: var(--color-surface-base);
-  /* A faint parchment-grain vignette keeps the backdrop from reading as flat. */
-  background-image:
-    var(--app-background-image, none),
-    radial-gradient(circle at 15% 12%, rgba(173, 114, 35, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 88%, rgba(114, 149, 69, 0.05), transparent 45%);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
   color: var(--color-slate-200);
   font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: -20px;
+  z-index: -1;
+  background-image: var(--app-background-image, none);
+  background-size: var(--app-bg-fit, cover);
+  background-position: var(--app-bg-position, center);
+  background-repeat: var(--app-bg-repeat, no-repeat);
+  background-attachment: fixed;
+  opacity: var(--app-bg-opacity, 1);
+  filter: blur(var(--app-bg-blur, 0px));
+  pointer-events: none;
+  transition: opacity 150ms ease, filter 150ms ease;
+}
+
+/* Dynamic Window & Dialog Opacity */
+:root[style*="--app-window-opacity"] .app-window,
+body[style*="--app-window-opacity"] .app-window,
+[style*="--app-window-opacity"] .app-window {
+  background-color: color-mix(in srgb, var(--color-surface-panel) calc(var(--app-window-opacity, 1) * 100%), transparent) !important;
+}
+
+/* Dynamic Chrome Opacity (Top header, Bottom toolbar, Left sidebar) */
+:root[style*="--app-chrome-opacity"] .app-chrome,
+body[style*="--app-chrome-opacity"] .app-chrome,
+[style*="--app-chrome-opacity"] .app-chrome {
+  background-color: color-mix(in srgb, var(--color-surface-raised) calc(var(--app-chrome-opacity, 1) * 100%), transparent) !important;
 }
 
 /* Headings use the engraved display face throughout. */
@@ -192,7 +225,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-heading, 0.02em);
 }
 
 /* Consistent, visible focus affordance for keyboard users across the app. */
@@ -209,12 +242,14 @@ h4 {
 
 /* ---- Rendered Markdown ---------------------------------------------------- */
 /* Prose styles for the markdown preview / read views. */
-.markdown-body > :first-child {
+.markdown-body> :first-child {
   margin-top: 0;
 }
-.markdown-body > :last-child {
+
+.markdown-body> :last-child {
   margin-bottom: 0;
 }
+
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
@@ -222,38 +257,48 @@ h4 {
   color: var(--color-slate-100);
   line-height: 1.2;
 }
+
 .markdown-body h1 {
   font-size: 1.25rem;
 }
+
 .markdown-body h2 {
   font-size: 1.1rem;
 }
+
 .markdown-body h3 {
   font-size: 1rem;
 }
+
 .markdown-body p,
 .markdown-body ul,
 .markdown-body ol,
 .markdown-body blockquote {
   margin: 0.5em 0;
 }
+
 .markdown-body ul,
 .markdown-body ol {
   padding-left: 1.25rem;
 }
+
 .markdown-body ul {
   list-style: disc;
 }
+
 .markdown-body ol {
   list-style: decimal;
 }
+
 .markdown-body a {
   color: var(--color-sky-300);
   text-decoration: underline;
 }
+
 .markdown-body strong {
   color: var(--color-slate-100);
 }
+
 .markdown-body code {
   border-radius: 0.2rem;
   background: var(--color-slate-800);
@@ -261,6 +306,7 @@ h4 {
   font-family: var(--font-mono);
   font-size: 0.85em;
 }
+
 .markdown-body pre {
   overflow-x: auto;
   border: 1px solid var(--color-slate-700);
@@ -268,25 +314,30 @@ h4 {
   background: var(--surface-inset, #1c160d);
   padding: 0.6rem 0.75rem;
 }
+
 .markdown-body pre code {
   background: none;
   padding: 0;
 }
+
 .markdown-body blockquote {
   border-left: 3px solid var(--color-sky-700);
   padding-left: 0.75rem;
   color: var(--color-slate-400);
 }
+
 .markdown-body hr {
   border: 0;
   border-top: 1px solid var(--color-slate-700);
   margin: 0.9rem 0;
 }
+
 .markdown-body table {
   width: 100%;
   border-collapse: collapse;
   margin: 0.6rem 0;
 }
+
 .markdown-body th,
 .markdown-body td {
   border: 1px solid var(--color-slate-700);
@@ -317,6 +368,7 @@ h4 {
     background-color 120ms ease,
     border-color 120ms ease;
 }
+
 .rt-btn:hover {
   border-color: var(--color-sky-600);
   background: var(--color-slate-800);

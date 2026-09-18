@@ -6,7 +6,6 @@ import { Rule, RuleCategory } from '../../../core/models/content.model';
 import { Attachment } from '../../../core/models/common.model';
 import { Tag } from '../../../core/models/actor.model';
 import { assetUrl } from '../../../core/services/asset-url';
-import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
 import { TagEditorComponent } from '../../../shared/tag-editor/tag-editor.component';
 import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
@@ -15,7 +14,7 @@ import { MarkdownEditorComponent } from '../../../shared/markdown-editor/markdow
 /** Rules browser: category rail on the left, rule list + editor on the right. */
 @Component({
   selector: 'app-rules-panel',
-  imports: [FormsModule, ImageUploadComponent, TagEditorComponent, IconPickerComponent, IconComponent, MarkdownEditorComponent],
+  imports: [FormsModule, TagEditorComponent, IconPickerComponent, IconComponent, MarkdownEditorComponent],
   templateUrl: './rules-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

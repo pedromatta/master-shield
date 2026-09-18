@@ -1,10 +1,10 @@
 <article
-  class="flex h-full min-h-0 w-full flex-col overflow-visible isolate rounded-lg border-2 bg-surface-panel shadow-md shadow-black/50 transition-colors"
+  class="app-window flex h-full min-h-0 w-full flex-col overflow-visible isolate rounded-lg border-2 bg-surface-panel shadow-md shadow-black/50 transition-colors"
   [class]="dragging() || resizing() ? 'border-sky-600' : 'border-slate-700'"
 >
   <!-- Title bar: a bronze rule under carved chrome reads as a framed panel. -->
   <header
-    class="flex shrink-0 cursor-grab items-center gap-2 border-b-2 border-sky-800 bg-gradient-to-b from-slate-800 to-slate-900 px-2 py-1 active:cursor-grabbing"
+    class="flex shrink-0 cursor-grab items-center gap-2 border-b-2 border-sky-600 bg-gradient-to-b from-surface-raised to-surface-panel px-2 py-1 active:cursor-grabbing"
     (pointerdown)="onDragStart($event)"
     (dblclick)="toggleMaximized()"
   >
@@ -54,7 +54,7 @@
   </header>
 
   <!-- Content -->
-  <div class="min-h-0 flex-1 overflow-auto bg-surface-base">
+  <div class="app-window min-h-0 flex-1 overflow-auto bg-surface-panel">
     <ng-content />
   </div>
 

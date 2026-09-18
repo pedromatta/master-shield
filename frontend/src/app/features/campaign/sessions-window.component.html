@@ -208,7 +208,7 @@
                 @for (encounter of encountersForActive(); track encounter.id) {
                   <li class="flex items-center gap-2 rounded border border-slate-700 bg-surface-panel px-2 py-1 text-[13px]">
                     <span class="min-w-0 flex-1 truncate text-slate-200">{{ encounter.name }} #{{ $index + 1 }}</span>
-                    <span class="text-[11px] text-slate-500">{{ encounter.participants?.length ?? 0 }} participant(s)</span>
+                    <span class="text-[11px] text-slate-500">{{ encounter.participants.length }} participant(s)</span>
                     @if (encounter.isActive) {
                       <span class="rounded bg-emerald-950 px-1 text-[11px] text-emerald-400">active</span>
                     }

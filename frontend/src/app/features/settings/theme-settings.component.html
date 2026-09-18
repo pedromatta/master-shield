@@ -1,17 +1,43 @@
-<section class="space-y-4 p-3" aria-label="Theme settings">
+<section class="space-y-4 p-3 max-h-full overflow-y-auto" aria-label="Theme settings">
   <header class="flex items-center gap-2">
-    <app-icon name="lu:palette" [size]="16" />
-    <h2 class="mr-auto text-sm font-semibold text-slate-100">Personal theme</h2>
-    @if (hasOverrides()) {
+    <div class="flex items-center gap-1.5">
       <button
         type="button"
-        class="rounded border border-slate-700 px-2 py-1 text-[12px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+        class="inline-flex items-center gap-1 rounded border border-slate-700 px-2 py-1 text-[12px] text-slate-300 transition hover:border-sky-600 hover:text-sky-200 focus:outline-none"
         [disabled]="busy()"
-        (click)="reset()"
+        (click)="exportTheme()"
+        title="Export theme to a JSON file"
       >
-        Reset
+        <app-icon name="lu:upload" [size]="12" />
+        <span>Export</span>
       </button>
-    }
+
+      <label
+        class="inline-flex cursor-pointer items-center gap-1 rounded border border-slate-700 px-2 py-1 text-[12px] text-slate-300 transition hover:border-sky-600 hover:text-sky-200 focus-within:ring-2 focus-within:ring-sky-500"
+        title="Import theme from a JSON file"
+      >
+        <app-icon name="lu:download" [size]="12" />
+        <span>Import</span>
+        <input
+          type="file"
+          accept=".json"
+          class="sr-only"
+          [disabled]="busy()"
+          (change)="importTheme($any($event.target).files); $any($event.target).value = ''"
+        />
+      </label>
+
+      @if (hasOverrides()) {
+        <button
+          type="button"
+          class="rounded border border-slate-700 px-2 py-1 text-[12px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none disabled:opacity-40"
+          [disabled]="busy()"
+          (click)="reset()"
+        >
+          Reset
+        </button>
+      }
+    </div>
   </header>
 
   @if (status()) {
@@ -20,62 +46,152 @@
     </p>
   }
 
-  <!-- Colours -->
-  <div class="rounded border border-slate-700 bg-surface-panel p-2">
-    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Colours</h3>
-    <div class="grid grid-cols-3 gap-2">
+  <!-- Presets -->
+  <div class="rounded border border-slate-700 bg-surface-panel p-2.5">
+    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Quick Presets</h3>
+    <div class="flex flex-wrap gap-1.5">
+      @for (preset of presets; track preset.name) {
+        <button
+          type="button"
+          class="rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[12px] text-slate-200 transition hover:border-sky-500 hover:bg-slate-700 hover:text-sky-200 focus:outline-none"
+          [disabled]="busy()"
+          (click)="applyPreset(preset)"
+        >
+          {{ preset.name }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Color Palette -->
+  <div class="rounded border border-slate-700 bg-surface-panel p-2.5">
+    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Complete Color Palette</h3>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
       <label class="flex flex-col gap-1 text-[12px] text-slate-300">
-        Accent
+        Primary Accent
         <input
           type="color"
           class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
           [value]="accent()"
-          (input)="setColor('accent', $any($event.target).value)"
+          (input)="setProp('accent', $any($event.target).value)"
         />
       </label>
       <label class="flex flex-col gap-1 text-[12px] text-slate-300">
-        Danger
+        Highlight / Gold
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="secondary()"
+          (input)="setProp('secondary', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Danger / Error
         <input
           type="color"
           class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
           [value]="danger()"
-          (input)="setColor('danger', $any($event.target).value)"
+          (input)="setProp('danger', $any($event.target).value)"
         />
       </label>
       <label class="flex flex-col gap-1 text-[12px] text-slate-300">
-        Success
+        Success / Health
         <input
           type="color"
           class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
           [value]="success()"
-          (input)="setColor('success', $any($event.target).value)"
+          (input)="setProp('success', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        App Backdrop Base
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="surfaceBase()"
+          (input)="setProp('surfaceBase', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Windows / Panels
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="surfacePanel()"
+          (input)="setProp('surfacePanel', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Headers / Toolbar
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="surfaceRaised()"
+          (input)="setProp('surfaceRaised', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Inputs & Wells
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="surfaceInset()"
+          (input)="setProp('surfaceInset', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Main Body Text
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="textMain()"
+          (input)="setProp('textMain', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Muted Subtext
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="textMuted()"
+          (input)="setProp('textMuted', $any($event.target).value)"
+        />
+      </label>
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Borders & Lines
+        <input
+          type="color"
+          class="h-8 w-full cursor-pointer rounded border border-slate-700 bg-slate-950"
+          [value]="borderColor()"
+          (input)="setProp('borderColor', $any($event.target).value)"
         />
       </label>
     </div>
   </div>
 
-  <!-- Fonts -->
-  <div class="rounded border border-slate-700 bg-surface-panel p-2">
-    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Fonts</h3>
-    <div class="grid gap-2 sm:grid-cols-2">
+  <!-- Typography -->
+  <div class="rounded border border-slate-700 bg-surface-panel p-2.5">
+    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Typography</h3>
+    <div class="grid gap-2.5 sm:grid-cols-2">
       <label class="flex flex-col gap-1 text-[12px] text-slate-300">
-        Body
+        Body Font Family
         <select
           class="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
           [value]="fontBody()"
-          (change)="setFont('fontBody', $any($event.target).value)"
+          (change)="setProp('fontBody', $any($event.target).value)"
         >
           @for (font of fonts; track font.value) {
             <option [value]="font.value">{{ font.label }}</option>
           }
         </select>
       </label>
+
       <label class="flex flex-col gap-1 text-[12px] text-slate-300">
-        Headings
+        Heading Font Family
         <select
           class="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
           [value]="fontDisplay()"
-          (change)="setFont('fontDisplay', $any($event.target).value)"
+          (change)="setProp('fontDisplay', $any($event.target).value)"
         >
           @for (font of displayFonts; track font.value) {
             <option [value]="font.value">{{ font.label }}</option>
@@ -85,20 +201,27 @@
     </div>
   </div>
 
-  <!-- Background -->
-  <div class="rounded border border-slate-700 bg-surface-panel p-2">
-    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Background</h3>
+  <!-- Background Image & Advanced Options -->
+  <div class="rounded border border-slate-700 bg-surface-panel p-2.5">
+    <h3 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Background Image</h3>
+
     @if (theme.settings().backgroundUri) {
-      <img
-        [src]="theme.settings().backgroundUri"
-        alt="Current background"
-        class="mb-2 h-24 w-full rounded border border-slate-700 object-cover"
-        loading="lazy"
-      />
+      <div class="relative mb-3 h-28 w-full overflow-hidden rounded border border-slate-700">
+        <img
+          [src]="theme.settings().backgroundUri"
+          alt="Current background preview"
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
+        <div class="absolute bottom-1 right-1 rounded bg-slate-950/80 px-2 py-0.5 text-[11px] text-slate-300">
+          Active Backdrop
+        </div>
+      </div>
     }
-    <div class="flex flex-wrap items-center gap-2">
-      <label class="cursor-pointer rounded border border-slate-700 px-2 py-1 text-[12px] text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
-        Upload image
+
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      <label class="cursor-pointer rounded border border-slate-700 px-3 py-1.5 text-[12px] text-slate-200 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500">
+        Upload Custom Image
         <input
           type="file"
           accept="image/*"
@@ -107,16 +230,85 @@
           (change)="onBackgroundChosen($any($event.target).files); $any($event.target).value = ''"
         />
       </label>
+
       @if (theme.settings().backgroundUri) {
         <button
           type="button"
-          class="rounded border border-slate-700 px-2 py-1 text-[12px] text-rose-400 transition hover:border-rose-600 hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+          class="rounded border border-slate-700 px-3 py-1.5 text-[12px] text-rose-400 transition hover:border-rose-600 hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
           [disabled]="busy()"
           (click)="clearBackground()"
         >
-          Remove
+          Remove Image
         </button>
       }
+    </div>
+
+    <!-- Background Configurations -->
+    <div class="grid gap-3 sm:grid-cols-2">
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Fit / Crop Mode
+        <select
+          class="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
+          [value]="backgroundFit()"
+          (change)="setProp('backgroundFit', $any($event.target).value)"
+        >
+          @for (mode of fitModes; track mode.value) {
+            <option [value]="mode.value">{{ mode.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Positioning
+        <select
+          class="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
+          [value]="backgroundPosition()"
+          (change)="setProp('backgroundPosition', $any($event.target).value)"
+        >
+          @for (pos of positions; track pos.value) {
+            <option [value]="pos.value">{{ pos.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Background Opacity: {{ (+backgroundOpacity() * 100).toFixed(0) }}%
+        <input
+          type="range"
+          min="0.05"
+          max="1"
+          step="0.05"
+          class="h-2 cursor-pointer rounded bg-slate-700 accent-sky-500"
+          [value]="backgroundOpacity()"
+          (change)="setProp('backgroundOpacity', $any($event.target).value)"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300">
+        Background Blur: {{ backgroundBlur() }}
+        <input
+          type="range"
+          min="0"
+          max="20"
+          step="1"
+          class="h-2 cursor-pointer rounded bg-slate-700 accent-sky-500"
+          [value]="backgroundBlur().replace('px', '')"
+          (change)="setProp('backgroundBlur', $any($event.target).value + 'px')"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1 text-[12px] text-slate-300 sm:col-span-2">
+        Window Transparency: {{ (+windowOpacity() * 100).toFixed(0) }}%
+        <input
+          type="range"
+          min="0.2"
+          max="1"
+          step="0.05"
+          class="h-2 cursor-pointer rounded bg-slate-700 accent-sky-500"
+          [value]="windowOpacity()"
+          (change)="setProp('windowOpacity', $any($event.target).value)"
+        />
+      </label>
     </div>
   </div>
 </section>

@@ -11,7 +11,6 @@ import { Attachment, SystemData } from '../../../core/models/common.model';
 import { ResourceBarComponent, ResourceChange } from '../../../shared/resource-bar/resource-bar.component';
 import { TagEditorComponent } from '../../../shared/tag-editor/tag-editor.component';
 import { SystemDataEditorComponent } from '../../../shared/system-data-editor/system-data-editor.component';
-import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
 import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { RulePickerComponent } from '../../../shared/rule-picker/rule-picker.component';
@@ -26,7 +25,6 @@ import { DEFAULT_RESOURCE_COLOR } from '../../../core/theme/theme';
     ResourceBarComponent,
     TagEditorComponent,
     SystemDataEditorComponent,
-    ImageUploadComponent,
     IconPickerComponent,
     IconComponent,
     RulePickerComponent,
