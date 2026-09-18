@@ -3,6 +3,7 @@ using System;
 using MasterShield.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MasterShield.Migrations
 {
     [DbContext(typeof(MasterShieldContext))]
-    partial class MasterShieldContextModelSnapshot : ModelSnapshot
+    [Migration("20260918131026_ActorOverviewFields")]
+    partial class ActorOverviewFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -510,10 +513,6 @@ namespace MasterShield.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Icon")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("IconId")
                         .IsRequired()
                         .HasColumnType("text");
 
