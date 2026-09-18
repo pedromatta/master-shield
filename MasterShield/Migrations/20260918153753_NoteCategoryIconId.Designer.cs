@@ -3,6 +3,7 @@ using System;
 using MasterShield.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MasterShield.Migrations
 {
     [DbContext(typeof(MasterShieldContext))]
-    partial class MasterShieldContextModelSnapshot : ModelSnapshot
+    [Migration("20260918153753_NoteCategoryIconId")]
+    partial class NoteCategoryIconId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -740,24 +743,6 @@ namespace MasterShield.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeAccent")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeBackgroundUri")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeDanger")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeFontBody")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeFontDisplay")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ThemeSuccess")
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
