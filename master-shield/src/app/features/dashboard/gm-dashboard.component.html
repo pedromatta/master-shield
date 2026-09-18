@@ -5,7 +5,7 @@
 
     <button
       type="button"
-      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[11px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[13px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       (click)="openCampaigns()"
     >
       <app-icon name="ra:tower" [size]="13" />
@@ -17,40 +17,29 @@
 
     <button
       type="button"
-      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[11px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[13px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
       [disabled]="!gameState.activeCampaignId()"
       (click)="openSessions()"
     >
       <app-icon name="lu:calendar" [size]="13" />
       <span>Sessions</span>
       @if (gameState.activeSession(); as session) {
-        <span class="text-slate-500">· #{{ session.sessionNumber }} {{ session.title }}</span>
+        <span class="text-slate-500">· {{ session.title }} #{{ session.sessionNumber }}</span>
       }
     </button>
 
     <button
       type="button"
-      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[11px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="inline-flex shrink-0 items-center gap-1.5 rounded border border-slate-700 bg-surface-raised px-2 py-1 text-[13px] text-slate-200 transition hover:border-sky-600 hover:bg-slate-700 hover:text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       (click)="openSystems()"
     >
       <app-icon name="ra:wrench" [size]="13" />
       <span>Systems</span>
     </button>
 
-    @if (gameState.activeSessionId()) {
-      <button
-        type="button"
-        class="inline-flex shrink-0 items-center gap-1.5 rounded border border-amber-800 bg-amber-950 px-2 py-1 text-[11px] text-amber-300 transition hover:border-amber-600 hover:bg-amber-900 hover:text-amber-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
-        (click)="createEncounter()"
-      >
-        <app-icon name="ra:crossed-swords" [size]="13" />
-        <span>Encounter</span>
-      </button>
-    }
-
     <button
       type="button"
-      class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded border border-sky-700 bg-sky-600 px-2 py-1 text-[11px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+      class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded border border-sky-700 bg-sky-600 px-2 py-1 text-[13px] font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
       (click)="showNewCampaign.set(true)"
     >
       <app-icon name="lu:plus" [size]="13" />
@@ -58,7 +47,7 @@
     </button>
 
     @if (sessionError()) {
-      <p class="truncate text-[10px] text-rose-400" role="alert">{{ sessionError() }}</p>
+      <p class="truncate text-[12px] text-rose-400" role="alert">{{ sessionError() }}</p>
     }
   </header>
 

@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 
 import { ContentStoreService } from '../../core/services/content-store.service';
 import { ActiveGameStateService } from '../../core/services/active-game-state.service';
-import { EncounterService } from '../../core/services/encounter.service';
 import { WindowManagerService, WindowKind } from '../../core/windows/window-manager.service';
 import { CampaignCreateComponent } from '../campaign/campaign-create.component';
 import { CharacterSidebarComponent } from './character-sidebar.component';
@@ -37,7 +36,6 @@ export class GmDashboardComponent {
   protected readonly gameState = inject(ActiveGameStateService);
   protected readonly store = inject(ContentStoreService);
   private readonly windows = inject(WindowManagerService);
-  private readonly encounters = inject(EncounterService);
 
   protected readonly showNewCampaign = signal(false);
   protected readonly sessionError = signal<string | null>(null);
@@ -113,27 +111,5 @@ export class GmDashboardComponent {
   protected onCampaignCreated(): void {
     this.showNewCampaign.set(false);
     this.ensureDefaultWindows();
-  }
-
-  /** Creates an encounter for the active session and focuses the tracker. */
-  protected async createEncounter(): Promise<void> {
-    const sessionId = this.gameState.activeSessionId();
-    if (!sessionId) {
-      this.sessionError.set('Create or select a session first.');
-      return;
-    }
-
-    try {
-      const encounter = await this.encounters.create({
-        sessionId,
-        name: `Encounter ${(this.gameState.activeSession()?.title ?? '').trim()}`.trim(),
-        isActive: true,
-        currentRound: 1,
-      });
-      this.gameState.setActiveEncounter(encounter.id);
-      this.windows.open({ kind: 'encounter', singleton: true });
-    } catch {
-      this.sessionError.set('Could not create the encounter.');
-    }
   }
 }

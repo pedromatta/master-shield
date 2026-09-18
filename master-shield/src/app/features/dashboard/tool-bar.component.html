@@ -5,7 +5,7 @@
   @for (tool of tools; track trackTool($index, tool)) {
     <button
       type="button"
-      class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[9px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+      class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
       [class]="isOpen(tool.kind) ? 'bg-surface-raised text-sky-300' : 'text-slate-400 hover:bg-surface-raised hover:text-slate-100'"
       [attr.aria-label]="'Open ' + tool.label"
       [attr.aria-pressed]="isOpen(tool.kind)"
@@ -22,14 +22,14 @@
     @for (category of pinnedCategories(); track trackCategory($index, category)) {
       <button
         type="button"
-        class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[9px] text-slate-400 transition hover:bg-surface-raised hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        class="flex shrink-0 flex-col items-center gap-0.5 rounded px-2 py-1 text-[11px] text-slate-400 transition hover:bg-surface-raised hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
         [attr.aria-label]="'Open rules: ' + category.name"
         (click)="openRuleCategory()"
       >
         @if (category.iconUri) {
           <img [src]="resolveAsset(category.iconUri)" alt="" class="size-4 rounded-sm object-cover" loading="lazy" />
         } @else {
-          <app-icon [name]="category.icon" [size]="18" />
+          <app-icon [name]="category.iconId ?? ''" [size]="18" />
         }
         <span class="max-w-[4rem] truncate">{{ category.name }}</span>
       </button>
