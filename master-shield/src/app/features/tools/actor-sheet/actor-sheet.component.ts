@@ -15,6 +15,7 @@ import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.
 import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { RulePickerComponent } from '../../../shared/rule-picker/rule-picker.component';
+import { MarkdownEditorComponent } from '../../../shared/markdown-editor/markdown-editor.component';
 import { DEFAULT_RESOURCE_COLOR } from '../../../core/theme/theme';
 
 /** Full editable character/NPC sheet, opened in a window from any actor card. */
@@ -29,6 +30,7 @@ import { DEFAULT_RESOURCE_COLOR } from '../../../core/theme/theme';
     IconPickerComponent,
     IconComponent,
     RulePickerComponent,
+    MarkdownEditorComponent,
   ],
   templateUrl: './actor-sheet.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -139,6 +141,19 @@ export class ActorSheetComponent {
     }
   }
 
+  /** Removes the uploaded portrait so the chosen icon shows instead. */
+  protected async onImageCleared(): Promise<void> {
+    const actor = this.actor();
+    if (!actor || !actor.imageUri) return;
+
+    this.error.set(null);
+    try {
+      await this.store.clearActorImage(actor.id);
+    } catch {
+      this.error.set('Could not clear the portrait.');
+    }
+  }
+
   /** Persists the chosen catalogue icon onto the actor. */
   protected async onIconChange(iconId: string): Promise<void> {
     const actor = this.actor();
@@ -168,6 +183,37 @@ export class ActorSheetComponent {
   protected readonly linkedRuleIds = computed(() =>
     (this.actor()?.ruleLinks ?? []).map((link) => link.ruleId),
   );
+
+  /** System-data fields the GM pinned to the Overview tab, rendered as a label/value list. */
+  protected readonly overviewEntries = computed(() => {
+    const actor = this.actor();
+    if (!actor) return [];
+
+    const data = actor.systemData ?? {};
+    return (actor.overviewFields ?? [])
+      .filter((key) => key in data)
+      .map((key) => ({ key, value: this.formatValue(data[key]) }));
+  });
+
+  private formatValue(value: unknown): string {
+    if (value === null || value === undefined) return '—';
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  }
+
+  /** Persists the pinned overview fields for this actor. */
+  protected async onOverviewFieldsChange(fields: string[]): Promise<void> {
+    const actor = this.actor();
+    if (!actor) return;
+
+    this.error.set(null);
+    try {
+      await this.store.updateActor({ ...actor, overviewFields: fields });
+    } catch {
+      this.error.set('Could not save the overview fields.');
+    }
+  }
 
   protected async onAttachmentChosen(file: File): Promise<void> {
     const actor = this.actor();
