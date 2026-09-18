@@ -41,6 +41,8 @@ export interface Actor {
   ruleLinks?: ActorRuleLink[];
   /** Resource ids the GM chose to surface in the encounter tracker (empty = all). */
   encounterResourceIds?: string[];
+  /** System-data keys pinned to the actor's Overview tab. */
+  overviewFields?: string[];
 }
 
 /** A rule linked to an actor. */

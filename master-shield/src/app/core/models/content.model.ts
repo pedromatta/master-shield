@@ -66,6 +66,8 @@ export interface RuleCategory {
   name: string;
   /** Uploaded icon under wwwroot. Empty until the GM uploads one. */
   iconUri: string;
+  /** Icon id (`ra:*` / `lu:*`) used when no image has been uploaded. */
+  iconId?: string;
   /** Fallback glyph shown when no icon image has been uploaded. */
   icon: string;
   sortOrder: number;
