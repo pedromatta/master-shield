@@ -65,11 +65,16 @@ builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ISystemEntityService, SystemEntityService>();
 
+// Browser origins allowed to call the API. Defaults cover the Angular dev server; the
+// CORS_ORIGINS environment variable overrides them for container deployments.
 const string devCorsPolicy = "MasterShieldDev";
+var allowedOrigins = (builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:4200,https://localhost:4200")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options => options.AddPolicy(
     devCorsPolicy,
     policy => policy
-        .WithOrigins("http://localhost:4200", "https://localhost:4200")
+        .WithOrigins(allowedOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()));
 
