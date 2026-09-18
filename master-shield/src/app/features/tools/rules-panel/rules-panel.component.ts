@@ -10,11 +10,12 @@ import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.
 import { TagEditorComponent } from '../../../shared/tag-editor/tag-editor.component';
 import { IconPickerComponent } from '../../../shared/icon/icon-picker.component';
 import { IconComponent } from '../../../shared/icon/icon.component';
+import { MarkdownEditorComponent } from '../../../shared/markdown-editor/markdown-editor.component';
 
 /** Rules browser: category rail on the left, rule list + editor on the right. */
 @Component({
   selector: 'app-rules-panel',
-  imports: [FormsModule, ImageUploadComponent, TagEditorComponent, IconPickerComponent, IconComponent],
+  imports: [FormsModule, ImageUploadComponent, TagEditorComponent, IconPickerComponent, IconComponent, MarkdownEditorComponent],
   templateUrl: './rules-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +32,7 @@ export class RulesPanelComponent {
 
   protected readonly newCategoryName = signal('');
   /** Icon held in memory until the category row exists to attach it to. */
+  protected readonly newCategoryIconId = signal('');
   protected readonly newCategoryIconFile = signal<File | null>(null);
   protected readonly newCategoryIconPreview = signal('');
 
@@ -113,12 +115,13 @@ export class RulesPanelComponent {
     if (!name) return;
 
     try {
-      const created = await this.store.createRuleCategory(name, '');
+      const created = await this.store.createRuleCategory(name, '', this.newCategoryIconId());
       const file = this.newCategoryIconFile();
       if (file) {
         await this.store.uploadRuleCategoryIcon(created.id, file);
       }
       this.newCategoryName.set('');
+      this.newCategoryIconId.set('');
       this.newCategoryIconFile.set(null);
       this.newCategoryIconPreview.set('');
       this.showCategoryForm.set(false);
@@ -138,13 +141,34 @@ export class RulesPanelComponent {
     this.draftCategoryName.set(category.name);
   }
 
-  /** Uploads a replacement icon directly against the persisted category. */
+  /** Saves the chosen catalogue icon onto the category. */
+  protected async onCategoryIconChange(category: RuleCategory, iconId: string): Promise<void> {
+    this.error.set(null);
+    try {
+      await this.store.updateRuleCategory({ ...category, iconId });
+    } catch {
+      this.error.set('Could not save the category icon.');
+    }
+  }
+
+  /** Uploads a replacement image icon directly against the persisted category. */
   protected async onCategoryIconChosen(category: RuleCategory, file: File): Promise<void> {
     this.error.set(null);
     try {
       await this.store.uploadRuleCategoryIcon(category.id, file);
     } catch {
       this.error.set('Could not upload the category icon.');
+    }
+  }
+
+  /** Removes a category's uploaded image so its chosen icon shows instead. */
+  protected async onCategoryIconCleared(category: RuleCategory): Promise<void> {
+    if (!category.iconUri) return;
+    this.error.set(null);
+    try {
+      await this.store.updateRuleCategory({ ...category, iconUri: '' });
+    } catch {
+      this.error.set('Could not clear the category icon.');
     }
   }
 
@@ -212,26 +236,8 @@ export class RulesPanelComponent {
     }
   }
 
-  /** Saves the chosen catalogue icon onto the rule. */
-  protected async onRuleIconChange(iconId: string): Promise<void> {
+  protected async onAttachmentChosen(file: File): Promise<void> {
     const rule = this.selectedRule();
-    if (!rule) return;
-    await this.store.updateRule({ ...rule, iconId });
-  }
-
-  /** Uploads a custom image for the rule (takes precedence over the icon). */
-  protected async onRuleImageChosen(file: File): Promise<void> {
-    const rule = this.selectedRule();
-    if (!rule) return;
-    this.error.set(null);
-    try {
-      await this.store.uploadAttachment('rule', rule.id, file);
-    } catch {
-      this.error.set('Could not upload the rule image.');
-    }
-  }
-
-  protected async onAttachmentChosen(file: File): Promise<void> {    const rule = this.selectedRule();
     if (!rule) return;
 
     this.error.set(null);
