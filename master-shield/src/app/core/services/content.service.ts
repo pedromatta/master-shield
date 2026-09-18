@@ -140,6 +140,7 @@ export class ContentService {
       campaignId: category.campaignId,
       name: category.name,
       icon: category.icon,
+      iconId: category.iconId,
       iconUri: category.iconUri,
       sortOrder: category.sortOrder,
       showInToolbar: category.showInToolbar,

@@ -48,6 +48,11 @@ export class UploadService {
     return this.uploadToEntity(`/actors/${actorId}/image`, file, 'imageUri');
   }
 
+  /** Clears an actor's uploaded portrait so its icon is used instead. */
+  clearActorImage(actorId: string): Promise<void> {
+    return firstValueFrom(this.http.delete<void>(`${this.base}/actors/${actorId}/image`));
+  }
+
   /** Uploads a location image (thumbnail / battle map). Returns the new URI. */
   uploadLocationImage(locationId: string, file: File): Promise<string> {
     return this.uploadToEntity(`/locations/${locationId}/image`, file, 'imageUri');

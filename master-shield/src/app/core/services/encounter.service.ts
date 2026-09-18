@@ -24,10 +24,18 @@ export class EncounterService {
     return firstValueFrom(this.http.get<Encounter>(`${this.baseUrl}/${id}`));
   }
 
+  /** Creates an encounter; the name is optional and defaults to "Encounter #N" server-side. */
   create(
-    encounter: Partial<Encounter> & Pick<Encounter, 'name' | 'sessionId'>,
+    encounter: Partial<Encounter> & Pick<Encounter, 'sessionId'>,
   ): Promise<Encounter> {
     return firstValueFrom(this.http.post<Encounter>(this.baseUrl, encounter));
+  }
+
+  /** Returns the session's current encounter, creating one if it has none. */
+  ensure(sessionId: string): Promise<Encounter> {
+    return firstValueFrom(
+      this.http.post<Encounter>(`${this.baseUrl}/session/${sessionId}/ensure`, null),
+    );
   }
 
   update(encounter: Encounter): Promise<void> {

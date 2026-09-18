@@ -18,8 +18,16 @@ export class SessionService {
     return firstValueFrom(this.http.get<Session>(`${this.baseUrl}/${id}`));
   }
 
-  create(session: Partial<Session> & Pick<Session, 'campaignId' | 'title'>): Promise<Session> {
+  /** Creates a session; the title is optional and defaults to "Session #N" server-side. */
+  create(session: Partial<Session> & Pick<Session, 'campaignId'>): Promise<Session> {
     return firstValueFrom(this.http.post<Session>(this.baseUrl, session));
+  }
+
+  /** Returns the campaign's current session, creating one if it has none. */
+  ensure(campaignId: string): Promise<Session> {
+    return firstValueFrom(
+      this.http.post<Session>(`${this.baseUrl}/campaign/${campaignId}/ensure`, null),
+    );
   }
 
   update(session: Session): Promise<void> {
