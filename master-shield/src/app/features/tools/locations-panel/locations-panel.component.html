@@ -10,6 +10,19 @@
         [value]="search()"
         (input)="search.set($any($event.target).value)"
       />
+      <label
+        class="shrink-0 cursor-pointer rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 transition hover:border-sky-600 hover:text-sky-300 focus-within:ring-2 focus-within:ring-sky-500"
+        title="Create a location for each selected image"
+      >
+        Bulk upload
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          class="sr-only"
+          (change)="onBulkUpload($any($event.target).files); $any($event.target).value = ''"
+        />
+      </label>
       <button
         type="button"
         class="shrink-0 rounded bg-sky-600 px-2 py-1 text-xs font-medium text-white transition hover:bg-sky-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"

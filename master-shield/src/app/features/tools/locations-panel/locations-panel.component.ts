@@ -33,6 +33,7 @@ export class LocationsPanelComponent {
   protected readonly editingId = signal<string | null>(null);
   protected readonly copied = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly busy = signal(false);
 
   protected readonly newName = signal('');
   /** Image of the location being created, uploaded before the record exists (kept in memory). */
@@ -172,6 +173,28 @@ export class LocationsPanelComponent {
       await this.store.uploadLocationImage(location.id, file);
     } catch {
       this.error.set('Could not upload the location image.');
+    }
+  }
+
+  /**
+   * Bulk-imports one location per selected image. Each file becomes a location named after
+   * the file, so a GM can drop a whole folder of maps at once.
+   */
+  protected async onBulkUpload(files: FileList | null): Promise<void> {
+    if (!files || files.length === 0) return;
+
+    this.busy.set(true);
+    this.error.set(null);
+    try {
+      for (const file of Array.from(files)) {
+        const name = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Location';
+        const created = await this.store.createLocation(name, '');
+        await this.store.uploadLocationImage(created.id, file);
+      }
+    } catch {
+      this.error.set('Could not import some of the selected images.');
+    } finally {
+      this.busy.set(false);
     }
   }
 
