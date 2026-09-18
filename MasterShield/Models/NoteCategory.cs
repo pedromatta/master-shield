@@ -18,6 +18,9 @@ public class NoteCategory
     /// <summary>Fallback glyph used only when no <see cref="IconUri"/> has been uploaded.</summary>
     public string Icon { get; set; } = "📝";
 
+    /// <summary>Icon id chosen from the RPG Awesome / Lucide catalogues.</summary>
+    public string IconId { get; set; } = "";
+
     public int SortOrder { get; set; }
 
     [JsonIgnore]

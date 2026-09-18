@@ -122,6 +122,7 @@ public class NoteService : MasterShieldContextService, INoteService
 
         existing.Name = category.Name;
         existing.Icon = category.Icon;
+        existing.IconId = category.IconId;
         existing.IconUri = category.IconUri;
         existing.SortOrder = category.SortOrder;
 
