@@ -14,7 +14,7 @@
   <div class="flex items-start gap-2">
     <!-- Drag handle -->
     <span
-      class="mt-1 shrink-0 cursor-grab select-none text-[10px] leading-none text-slate-600 active:cursor-grabbing"
+      class="mt-1 shrink-0 cursor-grab select-none text-[12px] leading-none text-slate-600 active:cursor-grabbing"
       aria-hidden="true"
       title="Drag to reorder"
     >
@@ -30,9 +30,11 @@
     >
       @if (portraitUri()) {
         <img [src]="portraitUri()" [alt]="''" class="size-10 object-cover" loading="lazy" />
+      } @else if (a) {
+        <app-icon [name]="iconId()" [size]="22" />
       } @else {
         <span class="text-sm font-semibold text-slate-100">{{ p.initiative }}</span>
-        <span class="text-[9px] uppercase tracking-wide text-slate-500">init</span>
+        <span class="text-[11px] uppercase tracking-wide text-slate-500">init</span>
       }
     </button>
 
@@ -43,18 +45,18 @@
         </h4>
         @if (p.isHiden) {
           <span
-            class="shrink-0 rounded bg-violet-950 px-1.5 text-[10px] font-medium text-violet-300"
+            class="shrink-0 rounded bg-violet-950 px-1.5 text-[12px] font-medium text-violet-300"
             title="Hidden from players"
           >
             hidden
           </span>
         }
         @if (isCurrentTurn()) {
-          <span class="shrink-0 rounded bg-sky-950 px-1.5 text-[10px] font-medium text-sky-300">turn</span>
+          <span class="shrink-0 rounded bg-sky-950 px-1.5 text-[12px] font-medium text-sky-300">turn</span>
         }
       </div>
 
-      <p class="mt-0.5 flex items-center gap-2 text-[11px] text-slate-400">
+      <p class="mt-0.5 flex items-center gap-2 text-[13px] text-slate-400">
         <span class="text-slate-600">{{ effectCount() }} effect(s)</span>
         <span class="ml-auto text-slate-600">init {{ p.initiative }}</span>
       </p>
@@ -63,7 +65,7 @@
       <div class="mt-1.5 flex items-center gap-1">
         <button
           type="button"
-          class="rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[10px] text-slate-400 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          class="rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[12px] text-slate-400 transition hover:border-sky-600 hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
           [disabled]="!a"
           [attr.aria-label]="'Open ' + (a?.name ?? 'actor') + ' sheet'"
           (click)="onOpenSheet()"
@@ -74,7 +76,7 @@
         <span class="ml-auto flex items-center gap-0.5">
           <button
             type="button"
-            class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            class="grid size-5 place-items-center rounded border border-slate-700 text-[12px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             [attr.aria-label]="'Move ' + (a?.name ?? 'participant') + ' up'"
             (click)="moveUp.emit()"
           >
@@ -82,7 +84,7 @@
           </button>
           <button
             type="button"
-            class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            class="grid size-5 place-items-center rounded border border-slate-700 text-[12px] leading-none text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             [attr.aria-label]="'Move ' + (a?.name ?? 'participant') + ' down'"
             (click)="moveDown.emit()"
           >
@@ -90,7 +92,7 @@
           </button>
           <button
             type="button"
-            class="grid size-5 place-items-center rounded border border-transparent text-[10px] text-slate-500 transition hover:border-rose-800 hover:bg-rose-950 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            class="grid size-5 place-items-center rounded border border-transparent text-[12px] text-slate-500 transition hover:border-rose-800 hover:bg-rose-950 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             [attr.aria-label]="'Remove ' + (a?.name ?? 'participant') + ' from encounter'"
             (click)="onRemove()"
           >
@@ -111,7 +113,7 @@
           }
         </div>
       } @else if (a) {
-        <p class="mt-1.5 text-[10px] italic text-slate-600">
+        <p class="mt-1.5 text-[12px] italic text-slate-600">
           No resources shown. Pick them in the actor sheet.
         </p>
       }

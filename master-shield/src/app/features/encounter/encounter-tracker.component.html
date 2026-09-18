@@ -12,21 +12,32 @@
       >
         @for (option of sessionEncounters(); track option.id) {
           <option [value]="option.id">
-            {{ option.name }}{{ option.isActive ? ' •' : '' }}
+            {{ encounterLabel(option) }}{{ option.isActive ? ' •' : '' }}
           </option>
         }
       </select>
     }
 
+    <button
+      type="button"
+      class="inline-flex shrink-0 items-center gap-1 rounded border border-slate-700 bg-surface-raised px-2 py-0.5 text-[13px] text-slate-300 transition hover:border-amber-600 hover:text-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+      [disabled]="pending() || !gameState.activeSessionId()"
+      title="Add another encounter to this session"
+      (click)="createEncounter()"
+    >
+      <app-icon name="ra:crossed-swords" [size]="12" />
+      <span>New</span>
+    </button>
+
     @if (encounter(); as e) {
       @if (e.isActive) {
-        <span class="shrink-0 rounded bg-emerald-950 px-1.5 text-[10px] font-medium text-emerald-400">active</span>
+        <span class="shrink-0 rounded bg-emerald-950 px-1.5 text-[12px] font-medium text-emerald-400">active</span>
       }
 
       <div class="ml-auto flex shrink-0 items-center gap-1">
         <button
           type="button"
-          class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          class="grid size-5 place-items-center rounded border border-slate-700 text-[12px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
           [disabled]="participants().length === 0"
           aria-label="Previous turn"
           (click)="previousTurn()"
@@ -35,7 +46,7 @@
         </button>
         <button
           type="button"
-          class="grid size-5 place-items-center rounded border border-slate-700 text-[10px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+          class="grid size-5 place-items-center rounded border border-slate-700 text-[12px] text-slate-400 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
           [disabled]="participants().length === 0"
           aria-label="Next turn"
           (click)="nextTurn()"
@@ -45,17 +56,17 @@
         <div class="mx-1 flex items-center gap-0.5 rounded border border-slate-700 px-1">
           <button
             type="button"
-            class="grid size-5 place-items-center text-[10px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+            class="grid size-5 place-items-center text-[12px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
             [disabled]="pending() || e.currentRound <= 1"
             aria-label="Previous round"
             (click)="previousRound()"
           >
             «
           </button>
-          <span class="px-1 text-[10px] text-slate-300">Round {{ e.currentRound }}</span>
+          <span class="px-1 text-[12px] text-slate-300">Round {{ e.currentRound }}</span>
           <button
             type="button"
-            class="grid size-5 place-items-center text-[10px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
+            class="grid size-5 place-items-center text-[12px] text-slate-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-30"
             [disabled]="pending()"
             aria-label="Next round"
             (click)="advanceRound()"
@@ -68,7 +79,7 @@
   </header>
 
   @if (error()) {
-    <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[11px] text-rose-300" role="alert">
+    <p class="shrink-0 border-b border-rose-900 bg-rose-950/60 px-2 py-1 text-[13px] text-rose-300" role="alert">
       {{ error() }}
     </p>
   }
@@ -110,26 +121,26 @@
       <div class="flex items-center gap-1.5">
         <button
           type="button"
-          class="rounded border border-slate-700 px-2 py-1 text-[11px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+          class="rounded border border-slate-700 px-2 py-1 text-[13px] text-slate-300 transition hover:border-slate-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
           [attr.aria-expanded]="showAdd()"
           (click)="showAdd.set(!showAdd())"
         >
           + Combatant
         </button>
         @if (pending()) {
-          <span class="text-[10px] text-sky-400">syncing…</span>
+          <span class="text-[12px] text-sky-400">syncing…</span>
         }
       </div>
 
       @if (showAdd()) {
         <div class="mt-1.5 flex items-end gap-1.5">
           <div class="min-w-0 flex-1">
-            <label for="encounter-actor" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+            <label for="encounter-actor" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
               Actor
             </label>
             <select
               id="encounter-actor"
-              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
               [value]="selectedActorId()"
               (change)="selectedActorId.set($any($event.target).value)"
             >
@@ -141,13 +152,13 @@
           </div>
 
           <div class="w-16">
-            <label for="encounter-initiative" class="mb-0.5 block text-[10px] uppercase tracking-wider text-slate-500">
+            <label for="encounter-initiative" class="mb-0.5 block text-[12px] uppercase tracking-wider text-slate-500">
               Init
             </label>
             <input
               id="encounter-initiative"
               type="number"
-              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-sky-500 focus:outline-none"
+              class="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-[13px] text-slate-200 focus:border-sky-500 focus:outline-none"
               [value]="newInitiative()"
               (input)="newInitiative.set(+$any($event.target).value)"
             />
@@ -155,7 +166,7 @@
 
           <button
             type="button"
-            class="rounded bg-slate-700 px-3 py-1 text-[11px] font-medium text-white transition hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
+            class="rounded bg-slate-700 px-3 py-1 text-[13px] font-medium text-white transition hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-40"
             [disabled]="!selectedActorId() || pending()"
             (click)="addParticipant()"
           >

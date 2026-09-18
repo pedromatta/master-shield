@@ -49,6 +49,9 @@ export class ParticipantCardComponent {
 
   protected readonly portraitUri = computed(() => assetUrl(this.actor()?.imageUri));
 
+  /** Icon shown when the actor has no uploaded portrait. */
+  protected readonly iconId = computed(() => this.actor()?.iconId ?? '');
+
   /**
    * The resources shown for this participant. The GM curates the list per actor in the
    * sheet; player characters reflect the actor's live values while NPCs use the
